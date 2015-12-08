@@ -1,0 +1,73 @@
+<?php
+
+/**
+ * @file
+ */
+
+/**
+ * Implements hook_schema().
+*/
+function user_external_invite_schema() {
+  $schema['user_external_invite'] = array(
+    'description' => 'Stores invites',
+    'fields' => array(
+      'id' => array(
+        'description' => 'Primary key of the Invite entity',
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'mail' => array(
+        'description' => 'Email address',
+        'type' => 'varchar',
+        'length' => 254,
+        'not null' => TRUE,
+      ),
+      'rid' => array(
+        'description' => 'Role ID to be granted',
+        'type' => 'int',
+        'not null' => TRUE,
+      ),
+      'expire' => array(
+        'description' => 'Valid until unix timestamp',
+        'type' => 'int',
+        'not null' => TRUE,
+      ),
+      'uid' => array(
+        'description' => 'User ID of who sent the invite',
+        'type' => 'int',
+        'not null' => TRUE,
+      ),
+      'message' => array(
+        'description' => 'Custom message included with invite',
+        'type' => 'text',
+        'not null' => FALSE,
+      ),
+    ),
+    'primary key' => array('id'),
+  );
+  return $schema;
+}
+
+/**
+ * adds fields to user_external_invite table for custom message and id
+ */
+function user_external_invite_update_7001() {
+  // add custom message
+  $spec = array(
+    'type' => 'text',
+    'description' => "Custom message included with invite",
+    'not null' => FALSE,
+  ); 
+  db_add_field('user_external_invite', 'message', $spec);
+  // add id
+    // Drop mail as primary key.
+  db_drop_primary_key('user_external_invite');
+  $spec = array(
+    'type' => 'serial',
+    'description' => 'Primary key of the Project entity',
+    'unsigned' => TRUE,
+    'not null' => TRUE,
+  );
+  db_add_field('user_external_invite', 'id', $spec, array('primary key' => array('id')));
+}
