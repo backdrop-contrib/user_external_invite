@@ -544,54 +544,6 @@ function user_external_invite_mail($key, &$message, $params) {
 }
 
 /**
- * Implements hook_theme().
- */
-function user_external_invite_theme($existing, $type, $theme, $path) {
-  return array(
-    'user_external_invite_email' => array(
-      'variables' => array(
-        'token' => '',
-        'rid' => '',
-        'role_name' => '',
-        'expire' => '',
-        'link' => '',
-        'uid' => '',
-        'site_name' => '',
-      ),
-      'template' => 'user-external-invite-email',
-    ),
-    'user_external_invite_sent_email' => array(
-      'variables' => array(
-        'rid' => '',
-        'role_name' => '',
-        'expire' => '',
-        'site_name' => '',
-        'invites' => array(),
-      ),
-      'template' => 'user-external-invite-sent-email',
-    ),
-    'user_external_invite_accepted_email' => array(
-      'variables' => array(
-        'rid' => '',
-        'role_name' => '',
-        'link' => '',
-        'site_name' => '',
-      ),
-      'template' => 'user-external-invite-accepted-email',
-    ),
-    'user_external_invite_confirmation_email' => array(
-      'variables' => array(
-        'rid' => '',
-        'role_name' => '',
-        'site_name' => '',
-        'invite' => '',
-      ),
-      'template' => 'user-external-invite-confirmation-email',
-    ),
-  );
-}
-
-/**
  * Page callback for accepting an invite.
  *
  * If logged in, checks invite token and grants role, sends to user page.
