@@ -1,12 +1,13 @@
 <?php
 
 /**
+ * Contents of user_external_invite.install
  * @file
  */
 
 /**
  * Implements hook_schema().
-*/
+ ß*/
 function user_external_invite_schema() {
   $schema['user_external_invite'] = array(
     'description' => 'Stores invites',
@@ -50,18 +51,17 @@ function user_external_invite_schema() {
 }
 
 /**
- * adds fields to user_external_invite table for custom message and id
+ * Adds fields to user_external_invite table for custom message and id
  */
 function user_external_invite_update_7001() {
-  // add custom message
+  // Add custom message.
   $spec = array(
     'type' => 'text',
     'description' => "Custom message included with invite",
     'not null' => FALSE,
-  ); 
+  );
   db_add_field('user_external_invite', 'message', $spec);
-  // add id
-    // Drop mail as primary key.
+  // Add id and drop mail as primary key.
   db_drop_primary_key('user_external_invite');
   $spec = array(
     'type' => 'serial',

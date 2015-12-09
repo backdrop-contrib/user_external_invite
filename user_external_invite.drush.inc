@@ -1,6 +1,11 @@
 <?php
 
 /**
+ * Contents of user_external_invite.drush.inc
+ * @file
+ */
+
+/**
  * Implements hook_drush_command().
  */
 function user_external_invite_drush_command() {
@@ -18,7 +23,7 @@ function user_external_invite_drush_command() {
 }
 
 /**
- * drush user-external-invite-send [mail] [role].
+ * Drush user-external-invite-send [mail] [role].
  */
 function drush_user_external_invite_send_invite() {
   $args = drush_get_arguments();
