@@ -2,9 +2,8 @@
 
 /**
  * @file
- *
+ * user_external_invite.module
  */
-
 
 /**
  * Implements hook_entity_info().
@@ -95,7 +94,7 @@ function user_external_invite_settings_form() {
     '#multiple' => TRUE,
   );
 
-  // days
+  // Days
   $form['user_external_invite_days_valid_for'] = array(
     '#type' => 'textfield',
     '#title' => t('Number of days invites are valid for'),
@@ -103,7 +102,7 @@ function user_external_invite_settings_form() {
     '#maxlength' => 3,
   );
 
-  // from email address
+  // From email address.
   $form['user_external_invite_use_universal_from_email'] = array(
     '#type' => 'checkbox',
     '#title' => t('Send all invites from a single email address'),
@@ -118,15 +117,15 @@ function user_external_invite_settings_form() {
     '#maxlength' => 256,
     '#states' => array(
       'visible' => array(
-        ':input[name="user_external_invite_use_universal_from_email"]' => array('checked' => TRUE),
+      ':input[name="user_external_invite_use_universal_from_email"]' => array('checked' => TRUE),
       'required' => array(
-        ':input[name="user_external_invite_use_universal_from_email"]' => array('checked' => TRUE),
+      ':input[name="user_external_invite_use_universal_from_email"]' => array('checked' => TRUE),
         ),
       ),
     ),
   );
 
-  // message templates
+  // Message templates.
   $form['user_external_invite_invite_template'] = array(
     '#title' => t('Invitation Email Template'),
     '#type' => 'textarea',
@@ -164,32 +163,37 @@ function user_external_invite_settings_form() {
   );
 
   //TODO: add warning email about expiring invititations
-
   $form['token_help']['content'] = array(
     '#type' => 'markup',
     '#token_types' => 'all',
-    '#theme' => 'token_tree'
+    '#theme' => 'token_tree',
   );
-
 
   return system_settings_form($form);
 }
 
+/**
+ * Form validation handler for user external invite settings form.
+ * @param $form
+ * @param $form_state
+ */
 function user_external_invite_settings_form_validate($form, &$form_state) {
-  // only validate the email if it is being used
+  // Only validate the email if it is being used.
   if ($form_state['values']['user_external_invite_use_universal_from_email']) {
-    if(valid_email_address($form_state['values']['user_external_invite_universal_from_email'])){
+    if (valid_email_address($form_state['values']['user_external_invite_universal_from_email'])){
       return;
     }
     form_set_error('user_external_invite_universal_from_email', t('Invalid email.'));
   }
 }
 
-
-
+/**
+ * Form submit function for user external invite settings form.
+ * @param $form
+ * @param $form_state
+ */
 function user_external_invite_settings_form_submit($form, &$form_state) {
-  // we don't need this here... we need to token_replace in the send... but let's test
-  //$form['user_external_invite_universal_invite_template'] = token_replace($form['user_external_invite_universal_invite_template'], array('node' => $form['node']));
+
 }
 
 /**
@@ -226,6 +230,11 @@ function user_external_invite_page() {
   return $build;
 }
 
+/**
+ * Get and return pending invites.
+ * @param null $mail
+ * @return mixed
+ */
 function _user_external_invite_pending_invites($mail = NULL) {
   $query = db_select('user_external_invite', 'i')
     ->fields('i');
@@ -236,6 +245,10 @@ function _user_external_invite_pending_invites($mail = NULL) {
   return $record;
 }
 
+/**
+ * Build table showing pending invites.
+ * @return array
+ */
 function _user_external_invite_pending_invites_table() {
   $build = array();
   $pending = _user_external_invite_pending_invites();
@@ -253,7 +266,7 @@ function _user_external_invite_pending_invites_table() {
 
     $rids = variable_get('user_external_invite_roles', NULL);
 
-    foreach($rids as $rid) {
+    foreach ($rids as $rid) {
       $roles[$rid] = _user_external_invite_role_name_from_rid($rid);
     }
 
@@ -294,13 +307,11 @@ function user_external_invite_form($form, &$form_state) {
 
   $rids = variable_get('user_external_invite_roles', NULL);
 
-  foreach($rids as $rid) {
+  foreach ($rids as $rid) {
     $role_options[$rid] = _user_external_invite_role_name_from_rid($rid);
   }
 
-  //@TODO: how to handle default? maybe role weight?
-
-
+  // @TODO: how to handle default? maybe role weight?
   $form['rid'] = array(
     '#title' => t('Role'),
     '#type' => 'radios',
@@ -370,8 +381,7 @@ function user_external_invite_form_submit(&$form, &$form_state) {
  * Adds invite to database and sends email.
  */
 function _user_external_invite_add_invite($rid, $emails, $uid, $message = NULL) {
-  //@TODO: add custom message handling
-
+  // @TODO: add custom message handling
   $now = REQUEST_TIME;
   $days = variable_get('user_external_invite_days_valid_for', 3);
   // Expire in X days.
@@ -401,8 +411,8 @@ function _user_external_invite_add_invite($rid, $emails, $uid, $message = NULL) 
     'site_name' => $site_name,
   );
 
-  //@TODO: use universal email?
-  $sent_mail = drupal_mail('user_external_invite', 'user_external_invite_sent', $user->mail, language_default(), $params, $from, TRUE);
+  // @TODO: use universal email?
+  drupal_mail('user_external_invite', 'user_external_invite_sent', $user->mail, language_default(), $params, $from, TRUE);
 }
 
 /**
@@ -422,7 +432,7 @@ function _user_external_invite_calculate_hash($rid, $email, $expire) {
 }
 
 function _user_external_invite_from_email($uid = NULL) {
-  // needs to be configurable
+  // Needs to be configurable.
   if(variable_get('user_external_invite_use_universal_from_email', NULL)) {
     return variable_get('user_external_invite_universal_from_email', NULL);
   } else {
@@ -469,7 +479,7 @@ function _user_external_invite_send_invite_mail($rid, $mail, $expire, $hash, $ui
   );
 
   // Send mail to user who was invited.
-  $sent_mail = drupal_mail('user_external_invite', 'user_external_invite_token', $mail, language_default(), $params, $from, TRUE);
+  drupal_mail('user_external_invite', 'user_external_invite_token', $mail, language_default(), $params, $from, TRUE);
 }
 
 /**
@@ -490,7 +500,7 @@ function _user_external_invite_send_invite_accepted_mail($rid, $mail) {
     'subject' => t('Access confirmation for the !site_name website', array('!site_name' => $site_name)),
     'body' => token_replace(variable_get('user_external_invite_accepted_confirmation_template'), array('ext-invite' => _user_external_invite_load_entity($mail))),
   );
-  $sent_mail = drupal_mail('user_external_invite', 'user_external_invite_accepted', $mail, language_default(), $params, $from, TRUE);
+  drupal_mail('user_external_invite', 'user_external_invite_accepted', $mail, language_default(), $params, $from, TRUE);
 }
 
 /**
@@ -511,7 +521,7 @@ function _user_external_invite_send_inviter_confirmation($uid, $mail, $rid) {
     'subject' => t('Access request confirmation'),
     'body' => token_replace(variable_get('user_external_invite_accepted_template'), array('ext-invite' => _user_external_invite_load_entity($mail))),
   );
-  $sent_mail = drupal_mail('user_external_invite', 'user_external_invite_confirmation', $account->mail, language_default(), $params, $from, TRUE);
+  drupal_mail('user_external_invite', 'user_external_invite_confirmation', $account->mail, language_default(), $params, $from, TRUE);
 }
 
 /**
@@ -578,16 +588,15 @@ function user_external_invite_grant_invite($key, $mail, $account) {
   $grant_rid = _user_external_invite_dehash($key, $mail);
 
   if ($grant_rid) {
-    // check to see if the user already has the role.  Becuase the email
-    // used in the invite is not always = to LDAP, they could already be
-    // in the role
-
+    // Check to see if the user already has the role.  Because the email
+    // Used in the invite is not always = to LDAP, they could already be
+    // In the role
     global $user;
     $role = user_role_load($grant_rid);
     if (in_array($role->name, $user->roles)) {
       return;
     }
-    $data = db_insert('users_roles')
+    db_insert('users_roles')
       ->fields(array(
         'uid' => $account->uid,
         'rid' => $grant_rid,
@@ -689,7 +698,7 @@ function user_external_invite_cron() {
   // Delete expired invites.
   $query = db_delete('user_external_invite')
     ->condition('expire', REQUEST_TIME, '<');
-  $record = $query->execute();
+  $query->execute();
 }
 
 /**
