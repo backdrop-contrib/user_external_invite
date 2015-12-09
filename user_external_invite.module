@@ -2,7 +2,8 @@
 
 /**
  * @file
- * user_external_invite.module
+ *
+ * Contents of user_external_invite.module.
  */
 
 /**
@@ -84,8 +85,8 @@ function user_external_invite_settings_form() {
   $form = array();
   $form['#validate'][] = 'user_external_invite_settings_form_validate';
   $form['#submit'][] = 'user_external_invite_settings_form_submit';
-  // roles
-  $form['user_external_invite_roles']= array(
+  // Roles that users can have.
+  $form['user_external_invite_roles'] = array(
     '#type' => 'select',
     '#title' => t('Roles users can be invited to join'),
     '#description' => t('Users with permission to send invites will be able to invite users to join a site with any of these roles.  GRANT WITH CAUTION!'),
@@ -94,7 +95,7 @@ function user_external_invite_settings_form() {
     '#multiple' => TRUE,
   );
 
-  // Days
+  // Days invite valid for.
   $form['user_external_invite_days_valid_for'] = array(
     '#type' => 'textfield',
     '#title' => t('Number of days invites are valid for'),
@@ -117,9 +118,9 @@ function user_external_invite_settings_form() {
     '#maxlength' => 256,
     '#states' => array(
       'visible' => array(
-      ':input[name="user_external_invite_use_universal_from_email"]' => array('checked' => TRUE),
-      'required' => array(
-      ':input[name="user_external_invite_use_universal_from_email"]' => array('checked' => TRUE),
+        ':input[name="user_external_invite_use_universal_from_email"]' => array('checked' => TRUE),
+        'required' => array(
+          ':input[name="user_external_invite_use_universal_from_email"]' => array('checked' => TRUE),
         ),
       ),
     ),
@@ -162,7 +163,7 @@ function user_external_invite_settings_form() {
     '#description' => t('Message sent to user being invited confirming the process was completed.'),
   );
 
-  //TODO: add warning email about expiring invititations
+  // @TODO: add warning email about expiring invititations.
   $form['token_help']['content'] = array(
     '#type' => 'markup',
     '#token_types' => 'all',
@@ -174,13 +175,11 @@ function user_external_invite_settings_form() {
 
 /**
  * Form validation handler for user external invite settings form.
- * @param $form
- * @param $form_state
  */
 function user_external_invite_settings_form_validate($form, &$form_state) {
   // Only validate the email if it is being used.
   if ($form_state['values']['user_external_invite_use_universal_from_email']) {
-    if (valid_email_address($form_state['values']['user_external_invite_universal_from_email'])){
+    if (valid_email_address($form_state['values']['user_external_invite_universal_from_email'])) {
       return;
     }
     form_set_error('user_external_invite_universal_from_email', t('Invalid email.'));
@@ -189,8 +188,6 @@ function user_external_invite_settings_form_validate($form, &$form_state) {
 
 /**
  * Form submit function for user external invite settings form.
- * @param $form
- * @param $form_state
  */
 function user_external_invite_settings_form_submit($form, &$form_state) {
 
@@ -232,10 +229,8 @@ function user_external_invite_page() {
 
 /**
  * Get and return pending invites.
- * @param null $mail
- * @return mixed
  */
-function _user_external_invite_pending_invites($mail = NULL) {
+function _user_external_invite_pending_invites( string $mail = NULL) {
   $query = db_select('user_external_invite', 'i')
     ->fields('i');
   if ($mail) {
@@ -247,7 +242,6 @@ function _user_external_invite_pending_invites($mail = NULL) {
 
 /**
  * Build table showing pending invites.
- * @return array
  */
 function _user_external_invite_pending_invites_table() {
   $build = array();
@@ -278,7 +272,7 @@ function _user_external_invite_pending_invites_table() {
         $roles[$r->rid],
         format_date($r->expire, 'short'),
         $inviter->mail,
-        l('Cancel invite', 'admin/people/invite/cancel/' . $r->mail),
+        l(t('Cancel invite'), 'admin/people/invite/cancel/' . $r->mail),
       );
     }
     $build['table']['#rows'] = $rows;
@@ -316,7 +310,7 @@ function user_external_invite_form($form, &$form_state) {
     '#title' => t('Role'),
     '#type' => 'radios',
     '#options' => $role_options,
-    //'#default_value' => $ce_role->rid,
+    // '#default_value' => $ce_role->rid,
   );
   $form['email'] = array(
     '#title' => t('Email addresses'),
@@ -353,8 +347,7 @@ function user_external_invite_form_validate(&$form, &$form_state) {
     if (!valid_email_address($mail)) {
       $error = TRUE;
       form_set_error('email', t('Incorrect email address (%mail). No invites were sent.', array('%mail' => $mail)));
-    }
-    else {
+    } else {
       $load = _user_external_invite_load_invite($mail);
       if (isset($load['mail'])) {
         form_set_error('email', t('Email address (%mail) has already been invited. No invites were sent.', array('%mail' => $mail)));
@@ -387,7 +380,7 @@ function _user_external_invite_add_invite($rid, $emails, $uid, $message = NULL) 
   // Expire in X days.
   $expire = $now + ($days * 24 * 60 * 60);
   foreach ($emails as $mail) {
-    $data = db_insert('user_external_invite')
+    db_insert('user_external_invite')
       ->fields(array(
         'mail' => $mail,
         'rid' => $rid,
@@ -427,13 +420,13 @@ function _user_external_invite_send_invite($rid, $email, $expire, $uid) {
  * Calculates the token based on $rid, $email, and $expire.
  */
 function _user_external_invite_calculate_hash($rid, $email, $expire) {
-  $hash = drupal_hmac_base64('user_rid:'.$rid.',user_mail:'.$email, drupal_get_hash_salt() . $email . $expire);
+  $hash = drupal_hmac_base64('user_rid:' . $rid . ',user_mail:' . $email, drupal_get_hash_salt() . $email . $expire);
   return $hash;
 }
 
 function _user_external_invite_from_email($uid = NULL) {
   // Needs to be configurable.
-  if(variable_get('user_external_invite_use_universal_from_email', NULL)) {
+  if (variable_get('user_external_invite_use_universal_from_email', NULL)) {
     return variable_get('user_external_invite_universal_from_email', NULL);
   } else {
     $user = user_load($uid);
@@ -442,13 +435,19 @@ function _user_external_invite_from_email($uid = NULL) {
 
 }
 
+/**
+ * Get role name from role ID.
+ */
 function _user_external_invite_role_name_from_rid($rid) {
   $user_role = user_role_load($rid);
   return $user_role->name;
 }
 
+/**
+ * Return site name.
+ */
 function _user_external_invite_site_name() {
-  //$site_name = implode(array(variable_get('site_name', ''), variable_get('site_name_2', ''), ), ' ');
+  // $site_name = implode(array(variable_get('site_name', ''), variable_get('site_name_2', ''), ), ' ');
   return variable_get('site_name', '');
 }
 
@@ -504,9 +503,11 @@ function _user_external_invite_send_invite_accepted_mail($rid, $mail) {
 }
 
 /**
- * uid: uid of user who sent the invite
- * mail: email address of user who was invited
- * rid: role id that was granted
+ * Sends confirmation to inviter that the invite was sent out.
+ *
+ * @param Integer $uid uid of user who sent the invite
+ * @param String $mail email address of user who was invited
+ * @param Integer $rid role id that was granted
  */
 function _user_external_invite_send_inviter_confirmation($uid, $mail, $rid) {
   $account = user_load($uid);
@@ -519,9 +520,11 @@ function _user_external_invite_send_inviter_confirmation($uid, $mail, $rid) {
     'site_name' => $site_name,
     'invite' => $mail,
     'subject' => t('Access request confirmation'),
-    'body' => token_replace(variable_get('user_external_invite_accepted_template'), array('ext-invite' => _user_external_invite_load_entity($mail))),
+    'body' => token_replace(variable_get('user_external_invite_accepted_template'),
+      array('ext-invite' => _user_external_invite_load_entity($mail))),
   );
-  drupal_mail('user_external_invite', 'user_external_invite_confirmation', $account->mail, language_default(), $params, $from, TRUE);
+  drupal_mail('user_external_invite', 'user_external_invite_confirmation', $account->mail, language_default(),
+    $params, $from, TRUE);
 }
 
 /**
@@ -535,21 +538,25 @@ function user_external_invite_mail($key, &$message, $params) {
       $message['body'][] = $params['body'];
       $message['subject'] = $params['subject'];
       break;
+
     case 'user_external_invite_sent':
       $message['body'] = array();
       $message['body'][] = $params['body'];
       $message['subject'] = $params['subject'];
       break;
+
     case 'user_external_invite_accepted':
       $message['body'] = array();
       $message['body'][] = $params['body'];
       $message['subject'] = $params['subject'];
       break;
+
     case 'user_external_invite_confirmation':
       $message['body'] = array();
       $message['body'][] = $params['body'];
       $message['subject'] = $params['subject'];
       break;
+
   }
 }
 
@@ -566,8 +573,7 @@ function user_external_invite_accept_invite() {
       global $user;
       user_external_invite_grant_invite($_GET['key'], $_GET['mail'], $user);
       drupal_goto('user');
-    }
-    else {
+    } else {
       drupal_goto('user/login', array(
         'query' => array(
           'key' => $_GET['key'],
@@ -613,14 +619,15 @@ function user_external_invite_grant_invite($key, $mail, $account) {
 
     // Once granted, remove entry from database.
     _user_external_invite_remove_invite($mail);
-  }
-  else {
-    drupal_set_message(t('Invite invalid or has expired! If you feel you have received this in error, please contact a site owner.'), 'error');
+  } else {
+    drupal_set_message(
+      t('Invite invalid or has expired! If you feel you have received this in error, please contact a site owner.'),
+      'error');
   }
 }
 
 /**
- * Loads external invite from entity from email
+ * Loads external invite from entity from email.
  */
 function _user_external_invite_load_entity($mail) {
   $query = new EntityFieldQuery();
@@ -636,7 +643,6 @@ function _user_external_invite_load_entity($mail) {
   }
 }
 
-
 /**
  * Implements hook_user_login().
  *
@@ -649,8 +655,12 @@ function user_external_invite_user_login(&$edit, $account) {
   }
 }
 
+/**
+ * @param String $mail Email address used for loading invite.
+ * @return mixed $query Full invite being loaded.
+ */
 function _user_external_invite_load_invite($mail) {
-  return db_select('user_external_invite', 'i')
+  return $query = db_select('user_external_invite', 'i')
     ->fields('i')
     ->condition('mail', $mail)
     ->execute()
@@ -702,8 +712,8 @@ function user_external_invite_cron() {
 }
 
 /**
-* Implements hook_token_info().
-*/
+ * Implements hook_token_info().
+ */
 function user_external_invite_token_info() {
   $types['user_external_invite'] = array(
     'name' => t("User External Invite"),
@@ -737,55 +747,57 @@ function user_external_invite_token_info() {
   );
 }
 
- 
 /**
-* Implements hook_tokens().
-*/
+ * Implements hook_tokens().
+ */
 function user_external_invite_tokens($type, $tokens, array $data = array(), array $options = array()) {
- 
- $replacements = array();   
-   if ($type == 'user_external_invite') {   
 
-     foreach ($tokens as $name => $original) {     
+  $replacements = array();
+  if ($type == 'user_external_invite') {
+
+    foreach ($tokens as $name => $original) {
       switch ($name) {
         case 'invite_role':
-          
           $name = _user_external_invite_role_name_from_rid($data['ext-invite']->rid);
           $replacements[$original] = $name;
           break;
+
       }
-      
+
       switch ($name) {
         case 'invite_link':
           $hash = _user_external_invite_calculate_hash($data['ext-invite']->rid, $data['ext-invite']->mail, $data['ext-invite']->expire);
           $link = url('user-external/accept-invite', array(
             'query' => array(
-            'key' => $hash,
-            'mail' => $data['ext-invite']->mail,
-             ),
+              'key' => $hash,
+              'mail' => $data['ext-invite']->mail,
+            ),
             'absolute' => TRUE,
-            ));
+          ));
           $replacements[$original] = $link;
           break;
+
         case 'invited_email':
           $replacements[$original] = $data['ext-invite']->mail;
           break;
+
         case 'invited_emails':
           $replacements[$original] = _user_external_invite_load_related_invites($data['ext-invite']);
           break;
+
         case 'invite_custom':
           $replacements[$original] = $data['ext-invite']->message;
           break;
+
       }
     }
   }
 
-  return $replacements;  
+  return $replacements;
 }
 
-
 /**
- * Load invites that were invited at the same time
+ * Load invites that were invited at the same time.
  */
 function _user_external_invite_load_related_invites($entity) {
   $query = new EntityFieldQuery();
@@ -804,3 +816,4 @@ function _user_external_invite_load_related_invites($entity) {
 
   return $emails;
 }
+
