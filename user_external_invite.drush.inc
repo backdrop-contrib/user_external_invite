@@ -2,7 +2,6 @@
 
 /**
  * @file
- *
  * This file provides a way to invite users to a site via drush.
  */
 

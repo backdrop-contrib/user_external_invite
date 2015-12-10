@@ -2,8 +2,7 @@
 
 /**
  * @file
- *
- * Contents of user_external_invite.module.
+ * Module invites a user to site when connecting via external protocol e.g. LDAP.
  */
 
 /**
@@ -331,7 +330,8 @@ function user_external_invite_form_validate(&$form, &$form_state) {
     if (!valid_email_address($mail)) {
       $error = TRUE;
       form_set_error('email', t('Incorrect email address (%mail). No invites were sent.', array('%mail' => $mail)));
-    } else {
+    }
+    else {
       $load = _user_external_invite_load_invite($mail);
       if (isset($load['mail'])) {
         form_set_error('email', t('Email address (%mail) has already been invited. No invites were sent.', array('%mail' => $mail)));
@@ -408,11 +408,18 @@ function _user_external_invite_calculate_hash($rid, $email, $expire) {
   return $hash;
 }
 
+/**
+ * Returns from address used to send mailing.
+ *
+ * @param null $uid
+ *   User ID being invited.
+ */
 function _user_external_invite_from_email($uid = NULL) {
   // Needs to be configurable.
   if (variable_get('user_external_invite_use_universal_from_email', NULL)) {
     return variable_get('user_external_invite_universal_from_email', NULL);
-  } else {
+  }
+  else {
     $user = user_load($uid);
     return $user->mail;
   }
@@ -431,7 +438,6 @@ function _user_external_invite_role_name_from_rid($rid) {
  * Return site name.
  */
 function _user_external_invite_site_name() {
-  // $site_name = implode(array(variable_get('site_name', ''), variable_get('site_name_2', ''), ), ' ');
   return variable_get('site_name', '');
 }
 
@@ -491,13 +497,12 @@ function _user_external_invite_send_invite_accepted_mail($rid, $mail) {
 /**
  * Sends confirmation to inviter that the invite was sent out.
  *
- * @param Integer $uid uid of user who sent the invite
-<<<<<<< HEAD
- * @param string $mail email address of user who was invited
-=======
- * @param String $mail email address of user who was invited
->>>>>>> 6039c8ab5369fdfa2ccfd1081b231225aa19b622
- * @param Integer $rid role id that was granted
+ * @param Integer $uid
+ *   Uid of user who sent the invite.
+ * @param String $mail
+ *   Email address of user who was invited.
+ * @param Integer $rid
+ *   Role id that was granted.
  */
 function _user_external_invite_send_inviter_confirmation($uid, $mail, $rid) {
   $account = user_load($uid);
@@ -554,7 +559,8 @@ function user_external_invite_mail($key, &$message, $params) {
  * Page callback for accepting an invite.
  *
  * If logged in, checks invite token and grants role, sends to user page.
- * If not logged in, sends to user/login with correct params to grant role on successful login.
+ * If not logged in, sends to user/login with correct params to grant role on
+ * successful login.
  */
 function user_external_invite_accept_invite() {
   if (isset($_GET['key']) && isset($_GET['mail'])) {
@@ -562,12 +568,13 @@ function user_external_invite_accept_invite() {
       global $user;
       user_external_invite_grant_invite($_GET['key'], $_GET['mail'], $user);
       drupal_goto('user');
-    } else {
+    }
+    else {
       drupal_goto('user/login', array(
         'query' => array(
           'key' => $_GET['key'],
           'mail' => $_GET['mail'],
-        )
+        ),
       ));
     }
   }
@@ -585,7 +592,7 @@ function user_external_invite_grant_invite($key, $mail, $account) {
   if ($grant_rid) {
     // Check to see if the user already has the role.  Because the email
     // Used in the invite is not always = to LDAP, they could already be
-    // In the role
+    // In the role.
     global $user;
     $role = user_role_load($grant_rid);
     if (in_array($role->name, $user->roles)) {
@@ -645,6 +652,8 @@ function user_external_invite_user_login(&$edit, $account) {
 }
 
 /**
+ * Loads an invite.
+ *
  * @param String $mail Email address used for loading invite.
  * @return mixed $query Full invite being loaded.
  */
@@ -804,4 +813,3 @@ function _user_external_invite_load_related_invites($entity) {
 
   return $emails;
 }
-

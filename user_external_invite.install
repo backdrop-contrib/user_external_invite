@@ -2,8 +2,8 @@
 
 /**
  * @file
- *
- * This file sets up database schema and install tasks for user_external_invite module.
+ * This file sets up database schema and install tasks for user_external_invite
+ * module.
  */
 
 /**
@@ -70,5 +70,6 @@ function user_external_invite_update_7001() {
     'unsigned' => TRUE,
     'not null' => TRUE,
   );
-  db_add_field('user_external_invite', 'id', $spec, array('primary key' => array('id')));
+  db_add_field('user_external_invite', 'id', $spec, array('primary key' =>
+    array('id')));
 }
