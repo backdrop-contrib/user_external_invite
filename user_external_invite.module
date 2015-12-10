@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Module invites a user to site when connecting via external protocol e.g. LDAP.
+ * Invites a user to site when connecting via external protocol e.g. LDAP.
  */
 
 /**
@@ -411,7 +411,7 @@ function _user_external_invite_calculate_hash($rid, $email, $expire) {
 /**
  * Returns from address used to send mailing.
  *
- * @param null $uid
+ * @param int $uid
  *   User ID being invited.
  */
 function _user_external_invite_from_email($uid = NULL) {
@@ -497,11 +497,11 @@ function _user_external_invite_send_invite_accepted_mail($rid, $mail) {
 /**
  * Sends confirmation to inviter that the invite was sent out.
  *
- * @param integer $uid
+ * @param int $uid
  *   Uid of user who sent the invite.
  * @param string $mail
  *   Email address of user who was invited.
- * @param integer $rid
+ * @param int $rid
  *   Role id that was granted.
  */
 function _user_external_invite_send_inviter_confirmation($uid, $mail, $rid) {
