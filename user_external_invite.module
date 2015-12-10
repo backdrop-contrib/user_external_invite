@@ -497,11 +497,11 @@ function _user_external_invite_send_invite_accepted_mail($rid, $mail) {
 /**
  * Sends confirmation to inviter that the invite was sent out.
  *
- * @param Integer $uid
+ * @param integer $uid
  *   Uid of user who sent the invite.
- * @param String $mail
+ * @param string $mail
  *   Email address of user who was invited.
- * @param Integer $rid
+ * @param integer $rid
  *   Role id that was granted.
  */
 function _user_external_invite_send_inviter_confirmation($uid, $mail, $rid) {
@@ -615,7 +615,8 @@ function user_external_invite_grant_invite($key, $mail, $account) {
 
     // Once granted, remove entry from database.
     _user_external_invite_remove_invite($mail);
-  } else {
+  }
+  else {
     drupal_set_message(
       t('Invite invalid or has expired! If you feel you have received this in error, please contact a site owner.'),
       'error');
@@ -654,11 +655,14 @@ function user_external_invite_user_login(&$edit, $account) {
 /**
  * Loads an invite.
  *
- * @param String $mail Email address used for loading invite.
- * @return mixed $query Full invite being loaded.
+ * @param string $mail
+ *   Email address used for loading invite.
+ *
+ * @return mixed $query
+ *   Full invite being loaded.
  */
 function _user_external_invite_load_invite($mail) {
-  return $query = db_select('user_external_invite', 'i')
+  return db_select('user_external_invite', 'i')
     ->fields('i')
     ->condition('mail', $mail)
     ->execute()
@@ -677,6 +681,8 @@ function _user_external_invite_remove_invite($mail) {
 }
 
 /**
+ * Determine whether invite is accepted based on hash.
+ *
  * Given a key-token and mail, calculate expected hash, if same as key,
  * return $rid of role to be granted.
  */
