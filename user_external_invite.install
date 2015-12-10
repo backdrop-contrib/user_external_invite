@@ -1,13 +1,14 @@
 <?php
 
 /**
- * Contents of user_external_invite.install
  * @file
+ *
+ * This file sets up database schema and install tasks for user_external_invite module.
  */
 
 /**
  * Implements hook_schema().
- ß*/
+ */
 function user_external_invite_schema() {
   $schema['user_external_invite'] = array(
     'description' => 'Stores invites',
@@ -51,7 +52,7 @@ function user_external_invite_schema() {
 }
 
 /**
- * Adds fields to user_external_invite table for custom message and id
+ * Adds fields to user_external_invite table for custom message and id.
  */
 function user_external_invite_update_7001() {
   // Add custom message.

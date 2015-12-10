@@ -1,8 +1,9 @@
 <?php
 
 /**
- * Contents of user_external_invite.drush.inc
  * @file
+ *
+ * This file provides a way to invite users to a site via drush.
  */
 
 /**
