@@ -97,7 +97,7 @@ function user_external_invite_settings_form() {
   $form['user_external_invite_days_valid_for'] = array(
     '#type' => 'textfield',
     '#title' => t('Number of days invites are valid for'),
-    '#default_value' => variable_get('user_external_invite_days_valid_for', 3),
+    '#default_value' => variable_get('user_external_invite_days_valid_for', 5),
     '#maxlength' => 3,
   );
 
@@ -360,7 +360,7 @@ function user_external_invite_form_submit(&$form, &$form_state) {
 function _user_external_invite_add_invite($rid, $emails, $uid, $message = NULL) {
   // @TODO: add custom message handling
   $now = REQUEST_TIME;
-  $days = variable_get('user_external_invite_days_valid_for', 3);
+  $days = variable_get('user_external_invite_days_valid_for', 5);
   // Expire in X days.
   $expire = $now + ($days * 24 * 60 * 60);
   foreach ($emails as $mail) {
