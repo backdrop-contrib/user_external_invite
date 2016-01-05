@@ -59,4 +59,5 @@ Current maintainers:
  * Alex Finnarn (https://www.drupal.org/u/afinnarn)
  
 This project has been sponsored by:
- * University of Colorado at Boulder (https://www.drupal.org/u/university-of-colorado-boulder)
+ * University of Colorado at Boulder 
+   (https://www.drupal.org/u/university-of-colorado-boulder)
