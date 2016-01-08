@@ -50,24 +50,3 @@ function user_external_invite_schema() {
   return $schema;
 }
 
-/**
- * Adds fields to user_external_invite table for custom message and id.
- */
-function user_external_invite_update_7001() {
-  // Add custom message.
-  $spec = array(
-    'type' => 'text',
-    'description' => "Custom message included with invite",
-    'not null' => FALSE,
-  );
-  db_add_field('user_external_invite', 'message', $spec);
-  // Add id and drop mail as primary key.
-  db_drop_primary_key('user_external_invite');
-  $spec = array(
-    'type' => 'serial',
-    'description' => 'Primary key of the Project entity',
-    'unsigned' => TRUE,
-    'not null' => TRUE,
-  );
-  db_add_field('user_external_invite', 'id', $spec, array('primary key' => array('id')));
-}
