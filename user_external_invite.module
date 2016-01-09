@@ -82,7 +82,6 @@ function user_external_invite_menu() {
 function user_external_invite_settings_form() {
   $form = array();
   $form['#validate'][] = 'user_external_invite_settings_form_validate';
-  $form['#submit'][] = 'user_external_invite_settings_form_submit';
   // Roles that users can have.
   $form['user_external_invite_roles'] = array(
     '#type' => 'select',
@@ -182,13 +181,6 @@ function user_external_invite_settings_form_validate($form, &$form_state) {
     }
     form_set_error('user_external_invite_universal_from_email', t('Invalid email.'));
   }
-}
-
-/**
- * Form submit function for user external invite settings form.
- */
-function user_external_invite_settings_form_submit($form, &$form_state) {
-
 }
 
 /**

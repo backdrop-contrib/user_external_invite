@@ -50,3 +50,18 @@ function user_external_invite_schema() {
   return $schema;
 }
 
+/**
+ * Implements hook_uninstall().
+ */
+function user_external_invite_uninstall() {
+  // Delete variables related to this module.
+  variable_del('user_external_invite_roles');
+  variable_del('user_external_invite_days_valid_for');
+  variable_del('user_external_invite_confirmation_template');
+  variable_del('user_external_invite_use_universal_from_email');
+  variable_del('user_external_invite_invite_template');
+  variable_del('user_external_invite_accepted_confirmation_template');
+  variable_del('user_external_invite_accepted_template');
+  variable_del('user_external_invite_universal_from_email');
+
+}
