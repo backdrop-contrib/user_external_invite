@@ -285,12 +285,14 @@ function user_external_invite_form($form, &$form_state) {
     '#title' => t('Role'),
     '#type' => 'radios',
     '#options' => $role_options,
-    // '#default_value' => $ce_role->rid,
+    '#default_value' => $rids[0],
+    '#required' => TRUE,
   );
   $form['email'] = array(
     '#title' => t('Email addresses'),
     '#type' => 'textarea',
-    '#description' => t('Comma separated list of email addresses to send the invitation email to'),
+    '#description' => t('Comma separated list of email addresses that are sent the invitation email.'),
+    '#required' => TRUE,
   );
 
   $form['custom_message'] = array(
