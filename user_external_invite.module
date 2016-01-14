@@ -280,7 +280,6 @@ function user_external_invite_form($form, &$form_state) {
     $role_options[$rid] = _user_external_invite_role_name_from_rid($rid);
   }
 
-  // @TODO: how to handle default? maybe role weight?
   $form['rid'] = array(
     '#title' => t('Role'),
     '#type' => 'radios',
