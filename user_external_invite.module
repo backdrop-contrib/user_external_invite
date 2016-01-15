@@ -424,7 +424,12 @@ function _user_external_invite_from_email($uid = NULL) {
  */
 function _user_external_invite_role_name_from_rid($rid) {
   $user_role = user_role_load($rid);
-  return $user_role->name;
+
+  // Format role name to be  more readable.
+  $role_name = $user_role->name;
+  $role_name = ucwords(str_replace('_', ' ', $role_name));
+
+  return $role_name;
 }
 
 /**
