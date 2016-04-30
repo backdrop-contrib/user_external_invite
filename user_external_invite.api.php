@@ -1,11 +1,9 @@
 <?php
 
 /**
- * Contains hooks provided by the user_external_invite module.
  * @file
- *
+ * Contains hooks provided by the user_external_invite module.
  */
-
 
 /**
  * Exclude roles used in invite process.
