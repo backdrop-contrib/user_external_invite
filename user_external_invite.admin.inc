@@ -120,6 +120,7 @@ function user_external_invite_form($form, &$form_state) {
 
   drupal_set_title(t('Invite New User'));
 
+  $role_options = array();
   $rids = variable_get('user_external_invite_roles', NULL);
 
   foreach ($rids as $rid) {
@@ -130,7 +131,7 @@ function user_external_invite_form($form, &$form_state) {
     '#title' => t('Role'),
     '#type' => 'radios',
     '#options' => $role_options,
-    '#default_value' => $rids[0],
+    '#default_value' => key($role_options),
     '#required' => TRUE,
   );
   $form['email'] = array(

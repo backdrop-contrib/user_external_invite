@@ -51,6 +51,15 @@ function user_external_invite_schema() {
 }
 
 /**
+ * Implements hook_install().
+ */
+function user_external_invite_install() {
+  // Add default roles for invite page.
+  $user_roles = array_keys(user_roles());
+  variable_set('user_external_invite_roles', array_combine($user_roles, $user_roles));
+}
+
+/**
  * Implements hook_uninstall().
  */
 function user_external_invite_uninstall() {
