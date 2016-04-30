@@ -14,8 +14,9 @@ function user_external_invite_settings_form() {
 
   // Define roles that users can have.
   $user_roles = user_roles();
-  $excluded_roles = module_invoke_all('user_external_invite_excluded_roles', $roles = array());
-  foreach ($excluded_roles as $key => $role_id) {
+  $roles = array();
+  $excluded_roles = module_invoke_all('user_external_invite_excluded_roles', $roles);
+  foreach ($excluded_roles as $role_id) {
     if (isset($user_roles[$role_id])) {
       unset($user_roles[$role_id]);
     }

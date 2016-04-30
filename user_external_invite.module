@@ -34,7 +34,7 @@ function user_external_invite_permission() {
   return array(
     'invite new user' => array(
       'title' => t('Invite new user'),
-      //'restrict access' => TRUE,
+      'restrict access' => TRUE,
       'description' => t('Allow access to send invitation email'),
     ),
   );
@@ -78,8 +78,6 @@ function user_external_invite_menu() {
   return $items;
 }
 
-
-
 /**
  * Page callback for admin/people/invite/cancel/%.
  *
@@ -102,7 +100,7 @@ function user_external_invite_page() {
 }
 
 /**
- * Implementes hook_user_external_invite_excluded_roles().
+ * Implements hook_user_external_invite_excluded_roles().
  *
  * It doesn't make sense to invite someone as an anonymous user, so we take out
  * that role here.

@@ -2,13 +2,13 @@
 
 /**
  * @file
+ *
  * Contains hooks provided by the user_external_invite module.
  */
 
 
 /**
- * Exclude roles that you wouldn't want administrators to be allowed to use in
- * the invite process.
+ * Exclude roles used in invite process.
  *
  * @return array
  *   List of roles to exclude.
