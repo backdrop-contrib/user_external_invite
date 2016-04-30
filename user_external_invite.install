@@ -56,7 +56,7 @@ function user_external_invite_schema() {
 function user_external_invite_install() {
   // Add default roles for invite page.
   $user_roles = user_roles();
-  if(($key = array_search('anonymous user', $user_roles)) !== false) {
+  if (($key = array_search('anonymous user', $user_roles)) !== FALSE) {
     unset($user_roles[$key]);
   }
   $user_roles = array_keys($user_roles);
