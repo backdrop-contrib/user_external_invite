@@ -102,6 +102,18 @@ function user_external_invite_page() {
 }
 
 /**
+ * Implementes hook_user_external_invite_excluded_roles().
+ *
+ * It doesn't make sense to invite someone as an anonymous user, so we take out
+ * that role here.
+ */
+function user_external_invite_user_external_invite_excluded_roles($roles) {
+  $anonymous_role = user_role_load_by_name('anonymous user');
+  $roles[] = $anonymous_role->rid;
+  return $roles;
+}
+
+/**
  * Get and return pending invites.
  */
 function _user_external_invite_pending_invites(string $mail = NULL) {

@@ -11,12 +11,20 @@
 function user_external_invite_settings_form() {
   $form = array();
   $form['#validate'][] = 'user_external_invite_settings_form_validate';
-  // Roles that users can have.
+
+  // Define roles that users can have.
+  $user_roles = user_roles();
+  $excluded_roles = module_invoke_all('user_external_invite_excluded_roles', $roles = array());
+  foreach ($excluded_roles as $key => $role_id) {
+    if (isset($user_roles[$role_id])) {
+      unset($user_roles[$role_id]);
+    }
+  }
   $form['user_external_invite_roles'] = array(
     '#type' => 'select',
     '#title' => t('Roles users can be invited to join'),
     '#description' => t('Users with permission to send invites will be able to invite users to join a site with any of these roles.  GRANT WITH CAUTION!'),
-    '#options' => user_roles(),
+    '#options' => $user_roles,
     '#default_value' => variable_get('user_external_invite_roles', NULL),
     '#multiple' => TRUE,
   );
@@ -126,6 +134,7 @@ function user_external_invite_form($form, &$form_state) {
   foreach ($rids as $rid) {
     $role_options[$rid] = _user_external_invite_role_name_from_rid($rid);
   }
+  asort($role_options);
 
   $form['rid'] = array(
     '#title' => t('Role'),
