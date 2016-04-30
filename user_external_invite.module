@@ -33,9 +33,9 @@ function user_external_invite_entity_info() {
 function user_external_invite_permission() {
   return array(
     'invite new user' => array(
-      'title' => 'Invite new user',
-      'restrict access' => TRUE,
-      'description' => 'Allow access to send invitation email',
+      'title' => t('Invite new user'),
+      //'restrict access' => TRUE,
+      'description' => t('Allow access to send invitation email'),
     ),
   );
 }
@@ -58,14 +58,14 @@ function user_external_invite_menu() {
     'title' => 'Invite user',
     'page callback' => 'user_external_invite_page',
     'page arguments' => array('user_external_invite_form'),
-    'access callback' => 'user_external_invite_form_access',
+    'access arguments' => array('invite new user'),
     'file' => 'user_external_invite.admin.inc',
     'type' => MENU_LOCAL_ACTION,
   );
   $items['admin/people/invite/cancel/%'] = array(
     'title' => 'Cancel user invite',
     'page callback' => 'user_external_invite_cancel_invite',
-    'access callback' => 'user_external_invite_form_access',
+    'access arguments' => array('invite new user'),
     'page arguments' => array(4),
     'type' => MENU_NORMAL_ITEM,
   );
@@ -90,18 +90,6 @@ function user_external_invite_cancel_invite($mail) {
   _user_external_invite_remove_invite($mail);
   drupal_set_message(t('Invite for !mail successfully canceled.', array('!mail' => $mail)));
   drupal_goto('admin/people/invite');
-}
-
-/**
- * Access callback for admin/people/invite.
- *
- * For some reason, simply using a callback of 'user_access()' was not working.
- */
-function user_external_invite_form_access() {
-  if (user_access('invite new user')) {
-    return TRUE;
-  }
-  return FALSE;
 }
 
 /**
