@@ -2,5 +2,6 @@ name = User External Invite
 description = "Allows users with permissions to assign a role and email invitations to other users. Requires external authentication."
 core = 7.x
 dependencies[] = token
+dependencies[] = entity
 
 configure = admin/config/people/invite
