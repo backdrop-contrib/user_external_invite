@@ -228,7 +228,12 @@ function _user_external_invite_from_email($uid = NULL) {
     return variable_get('user_external_invite_universal_from_email', NULL);
   }
   else {
-    $user = user_load($uid);
+    // Get logged in user if none passed.
+    if ($uid === NULL) {
+      global $user;
+    } else {
+      $user = user_load($uid);
+    }
     return $user->mail;
   }
 
@@ -282,7 +287,7 @@ function _user_external_invite_send_invite_mail($rid, $mail, $expire, $hash, $ui
   );
 
   // Send mail to user who was invited.
-  drupal_mail('user_external_invite', 'user_external_invite_token', $mail, language_default(), $params, $from, TRUE);
+  $sent = drupal_mail('user_external_invite', 'user_external_invite_token', $mail, language_default(), $params, $from, TRUE);
 }
 
 /**
