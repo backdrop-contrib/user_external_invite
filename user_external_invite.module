@@ -230,11 +230,13 @@ function _user_external_invite_from_email($uid = NULL) {
   // Needs to be configurable.
   if (variable_get('user_external_invite_use_universal_from_email', NULL)) {
     return variable_get('user_external_invite_universal_from_email', NULL);
-  } else {
+  }
+  else {
     // Get logged in user if none passed.
     if ($uid === NULL) {
       global $user;
-    } else {
+    }
+    else {
       $user = user_load($uid);
     }
     return $user->mail;
@@ -499,7 +501,8 @@ function _user_external_invite_change_invite_status($mail, $status) {
     db_delete('user_external_invite')
       ->condition('mail', $mail)
       ->execute();
-  } else {
+  }
+  else {
     db_update('user_external_invite')
       ->fields(array('status' => $status))
       ->condition('mail', $mail)
