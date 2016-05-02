@@ -291,7 +291,7 @@ function _user_external_invite_send_invite_mail($rid, $mail, $expire, $hash, $ui
   );
 
   // Send mail to user who was invited.
-  $sent = drupal_mail('user_external_invite', 'user_external_invite_token', $mail, language_default(), $params, $from, TRUE);
+  drupal_mail('user_external_invite', 'user_external_invite_token', $mail, language_default(), $params, $from, TRUE);
 }
 
 /**
@@ -543,7 +543,7 @@ function _user_external_invite_dehash($key, $mail) {
  */
 function user_external_invite_cron() {
   // Set status of expired invites.
-  $query = db_update('user_external_invite')
+  db_update('user_external_invite')
     ->fields(array('status' => 'expired'))
     ->condition('expire', REQUEST_TIME, '<')
     ->execute();
