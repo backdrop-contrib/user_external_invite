@@ -30,6 +30,14 @@ function user_external_invite_settings_form() {
     '#multiple' => TRUE,
   );
 
+  $form['user_external_default_invite_role'] = array(
+    '#title' => t('Default Role to Invite'),
+    '#description' => 'Choose the default role you wish to have selected on the invite page.',
+    '#type' => 'radios',
+    '#options' => $user_roles,
+    '#default_value' => variable_get('user_external_default_invite_role', key($user_roles)),
+  );
+
   // Days invite valid for.
   $form['user_external_invite_days_valid_for'] = array(
     '#type' => 'textfield',
@@ -141,7 +149,7 @@ function user_external_invite_form($form, &$form_state) {
     '#title' => t('Role'),
     '#type' => 'radios',
     '#options' => $role_options,
-    '#default_value' => key($role_options),
+    '#default_value' => variable_get('user_external_default_invite_role', key($role_options)),
     '#required' => TRUE,
   );
   $form['email'] = array(
