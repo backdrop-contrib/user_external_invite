@@ -128,5 +128,5 @@ function user_external_invite_update_7001() {
     'length' => 254,
     'not null' => TRUE,
   );
-  db_add_field( 'user_external_invite', 'status', $spec);
+  db_add_field('user_external_invite', 'status', $spec);
 }

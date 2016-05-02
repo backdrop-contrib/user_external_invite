@@ -230,8 +230,7 @@ function _user_external_invite_from_email($uid = NULL) {
   // Needs to be configurable.
   if (variable_get('user_external_invite_use_universal_from_email', NULL)) {
     return variable_get('user_external_invite_universal_from_email', NULL);
-  }
-  else {
+  } else {
     // Get logged in user if none passed.
     if ($uid === NULL) {
       global $user;
@@ -240,7 +239,6 @@ function _user_external_invite_from_email($uid = NULL) {
     }
     return $user->mail;
   }
-
 }
 
 /**
@@ -497,7 +495,6 @@ function _user_external_invite_load_invite($mail) {
  * Called to change the status of invite from pending to accepted or expired.
  */
 function _user_external_invite_change_invite_status($mail, $status) {
-
   if ($status === 'canceled') {
     db_delete('user_external_invite')
       ->condition('mail', $mail)
@@ -508,7 +505,6 @@ function _user_external_invite_change_invite_status($mail, $status) {
       ->condition('mail', $mail)
       ->execute();
   }
-
 }
 
 /**
