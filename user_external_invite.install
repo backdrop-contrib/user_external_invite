@@ -34,6 +34,12 @@ function user_external_invite_schema() {
         'type' => 'int',
         'not null' => TRUE,
       ),
+      'status' => array(
+        'description' => 'Status of the Invitation',
+        'type' => 'varchar',
+        'length' => 254,
+        'not null' => TRUE,
+      ),
       'uid' => array(
         'description' => 'User ID of who sent the invite',
         'type' => 'int',
@@ -110,4 +116,17 @@ If you did not submit this request or need to modify it, please contact your adm
 To access and edit this site:
 1) Go to [site:login-url]
 2) Login with your username and password.');
+}
+
+/**
+ * Add status row to table.
+ */
+function user_external_invite_update_7001() {
+  $spec = array(
+    'description' => 'Status of the Invitation',
+    'type' => 'varchar',
+    'length' => 254,
+    'not null' => TRUE,
+  );
+  db_add_field( 'user_external_invite', 'status', $spec);
 }

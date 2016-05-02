@@ -85,7 +85,7 @@ function user_external_invite_menu() {
  */
 function user_external_invite_cancel_invite($mail) {
   // @todo verify $mail is valid and invite currently exists.
-  _user_external_invite_remove_invite($mail);
+  _user_external_invite_change_invite_status($mail, 'canceled');
   drupal_set_message(t('Invite for !mail successfully canceled.', array('!mail' => $mail)));
   drupal_goto('admin/people/invite');
 }
@@ -138,11 +138,11 @@ function _user_external_invite_pending_invites_table() {
       t('Role'),
       t('Expires'),
       t('Inviter'),
+      t('Status'),
       t('Actions'),
     );
 
     $rids = variable_get('user_external_invite_roles', NULL);
-
     foreach ($rids as $rid) {
       $roles[$rid] = _user_external_invite_role_name_from_rid($rid);
     }
@@ -154,6 +154,7 @@ function _user_external_invite_pending_invites_table() {
         $roles[$r->rid],
         format_date($r->expire, 'short'),
         $inviter->mail,
+        $r->status,
         l(t('Cancel invite'), 'admin/people/invite/cancel/' . $r->mail),
       );
     }
@@ -171,12 +172,15 @@ function _user_external_invite_add_invite($rid, $emails, $uid, $message = NULL) 
   $days = variable_get('user_external_invite_days_valid_for', 5);
   // Expire in X days.
   $expire = $now + ($days * 24 * 60 * 60);
+  // All invites start out as pending.
+  $status = 'Pending';
   foreach ($emails as $mail) {
     db_insert('user_external_invite')
       ->fields(array(
         'mail' => $mail,
         'rid' => $rid,
         'expire' => $expire,
+        'status' => $status,
         'uid' => $uid,
         'message' => $message,
       ))
@@ -431,8 +435,8 @@ function user_external_invite_grant_invite($key, $mail, $account) {
     // Send email to inviter.
     _user_external_invite_send_inviter_confirmation($invite['uid'], $invite['mail'], $invite['rid']);
 
-    // Once granted, remove entry from database.
-    _user_external_invite_remove_invite($mail);
+    // Once granted, change status of invite in database.
+    _user_external_invite_change_invite_status($mail, 'granted');
   }
   else {
     drupal_set_message(
@@ -488,14 +492,23 @@ function _user_external_invite_load_invite($mail) {
 }
 
 /**
- * Remove invite row from {user_external_invite}.
+ * Change status of invite in {user_external_invite} table.
  *
- * Called after invite has been used, or on cron after expiration.
+ * Called to change the status of invite from pending to accepted or expired.
  */
-function _user_external_invite_remove_invite($mail) {
-  db_delete('user_external_invite')
-    ->condition('mail', $mail)
-    ->execute();
+function _user_external_invite_change_invite_status($mail, $status) {
+
+  if ($status === 'canceled') {
+    db_delete('user_external_invite')
+      ->condition('mail', $mail)
+      ->execute();
+  } else {
+    db_update('user_external_invite')
+      ->fields(array('status' => $status))
+      ->condition('mail', $mail)
+      ->execute();
+  }
+
 }
 
 /**
@@ -525,12 +538,15 @@ function _user_external_invite_dehash($key, $mail) {
 
 /**
  * Implements hook_cron().
+ *
+ * Set invites to expired status if too much time has passed.
  */
 function user_external_invite_cron() {
-  // Delete expired invites.
-  $query = db_delete('user_external_invite')
-    ->condition('expire', REQUEST_TIME, '<');
-  $query->execute();
+  // Set status of expired invites.
+  $query = db_update('user_external_invite')
+    ->fields(array('status' => 'expired'))
+    ->condition('expire', REQUEST_TIME, '<')
+    ->execute();
 }
 
 /**
