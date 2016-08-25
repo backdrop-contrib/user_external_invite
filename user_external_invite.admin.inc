@@ -43,7 +43,18 @@ function user_external_invite_settings_form() {
     '#type' => 'textfield',
     '#title' => t('Number of days invites are valid for'),
     '#default_value' => variable_get('user_external_invite_days_valid_for', 5),
+    '#element_validate' => array('element_validate_number'),
     '#maxlength' => 3,
+  );
+
+  // Delete old invites after a certain time.
+  $form['user_external_invite_delete_old_invites'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Invite Deletion'),
+    '#default_value' => 60*60*24*30,
+    '#size' => 60,
+    '#element_validate' => array('element_validate_number'),
+    '#required' => TRUE,
   );
 
   // From email address.

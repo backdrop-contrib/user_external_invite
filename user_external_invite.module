@@ -92,7 +92,6 @@ function user_external_invite_page() {
   return $build;
 }
 
-
 /**
  * Build table showing pending invites.
  */
@@ -615,8 +614,14 @@ function _user_external_invite_dehash($key, $mail) {
 function user_external_invite_cron() {
   // Set status of expired invites.
   db_update('user_external_invite')
-    ->fields(array('status' => 'expired'))
+    ->fields(array('status' => 'Expired'))
     ->condition('expire', REQUEST_TIME, '<')
+    ->execute();
+
+  // Delete old invites after 30 days.
+  $expire_time = variable_get('user_external_invite_delete_old_invites', 60*60*24*30);
+  db_delete('user_external_invite')
+    ->condition('expire', REQUEST_TIME - $expire_time, '<')
     ->execute();
 }
 
