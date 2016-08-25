@@ -62,13 +62,6 @@ function user_external_invite_menu() {
     'file' => 'user_external_invite.admin.inc',
     'type' => MENU_LOCAL_ACTION,
   );
-  $items['admin/people/invite/cancel/%'] = array(
-    'title' => 'Cancel user invite',
-    'page callback' => 'user_external_invite_cancel_invite',
-    'access arguments' => array('invite new user'),
-    'page arguments' => array(4),
-    'type' => MENU_NORMAL_ITEM,
-  );
   $items['user-external/accept-invite'] = array(
     'title' => 'Accept an invite',
     'page callback' => 'user_external_invite_accept_invite',
@@ -95,8 +88,125 @@ function user_external_invite_cancel_invite($mail) {
  */
 function user_external_invite_page() {
   $build['form'] = drupal_get_form('user_external_invite_form');
-  $build['invites'] = _user_external_invite_pending_invites_table();
+  $build['invites'] = drupal_get_form('user_external_invite_pending_invites_form');
   return $build;
+}
+
+
+/**
+ * Build table showing pending invites.
+ */
+function user_external_invite_pending_invites_form($form, &$form_state) {
+  $form = array();
+
+  // Add container for operations functionality.
+  $form['operations'] = array(
+    '#type' => 'fieldset',
+    '#title' => 'Operations',
+  );
+
+  // Add select list for choosing operations.
+  $select_options = array(
+    'user_external_invite_cancel_invites' => 'Cancel Invites',
+  );
+
+  $form['operations']['select'] = array(
+    '#type' => 'select',
+    //'#title' => t('Operations'),
+    '#options' => $select_options,
+    '#default_value' => $select_options[0],
+  );
+
+  // Add submit button for operations.
+  $form['operations']['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Submit'),
+  );
+
+  $headers = array(
+    'id' => t('ID'),
+    'mail' => t('Email'),
+    'role' => t('Role'),
+    'expire' => t('Expires'),
+    'inviter' => t('Inviter'),
+    'status' => t('Status'),
+  );
+
+  $rids = variable_get('user_external_invite_roles', NULL);
+  foreach ($rids as $rid) {
+    $roles[$rid] = _user_external_invite_role_name_from_rid($rid);
+  }
+
+  $pending = _user_external_invite_pending_invites(NULL, $headers);
+  while ($r = $pending->fetchObject()){
+    $inviter = user_load($r->uid);
+    $rows[] = array(
+      'id' => $r->id,
+      'mail' => $r->mail,
+      'role' => $roles[$r->rid],
+      'expire' => format_date($r->expire, 'short'),
+      'inviter' => $inviter->mail,
+      'status' => $r->status,
+    );
+  }
+
+  $form['table'] = array(
+    '#type' => 'tableselect',
+    '#header' => $headers,
+    '#options' => $rows,
+    '#suffix' => empty($rows) ? 'No pending invites.' : '',
+    '#weight' => 10,
+  );
+
+  $form['pager'] = array(
+    '#theme' => 'pager',
+    '#weight' => 11,
+  );
+
+  return $form;
+}
+
+/**
+ * Submit callback for user_external_invite_pending_invites_form().
+ *
+ * @param $form
+ * @param $form_state
+ */
+function user_external_invite_pending_invites_form_submit(&$form, &$form_state) {
+
+  $table_options = $form['table']['#options'];
+  $selected_options = $form_state['input']['table'];
+  $operation = $form_state['values']['select'];
+  $ids = array();
+
+  // Loop through selected rows and match with invite IDs.
+  foreach ($selected_options as $key => $option) {
+    if ($option != NULL) {
+      $ids[] = $table_options[$key]['id'];
+    }
+  }
+
+  // Pass IDs to submit callback function.
+  call_user_func($operation, $ids);
+}
+
+/**
+ * Callback to cancel/remove pending invites.
+ *
+ * @param array $ids
+ */
+function user_external_invite_cancel_invites($ids = array()) {
+  // If no IDs passed then return with error message.
+  if (empty($ids)) {
+    drupal_set_message('No invites selected for operation. Please select desired invites and try again.', 'error');
+    return;
+  }
+
+  // Delete pending invites from database and set message.
+  db_delete('user_external_invite')
+    ->condition('id', $ids, 'IN')
+    ->execute();
+  drupal_set_message(t('Deleted :ids user :invites.', array(':ids' => count($ids), ':invites' => count($ids) > 1 ? 'invites' : 'invite')));
 }
 
 /**
@@ -114,53 +224,15 @@ function user_external_invite_user_external_invite_excluded_roles($roles) {
 /**
  * Get and return pending invites.
  */
-function _user_external_invite_pending_invites(string $mail = NULL) {
+function _user_external_invite_pending_invites(string $mail = NULL, $headers) {
   $query = db_select('user_external_invite', 'i')
     ->fields('i');
+  $query = $query->extend('PagerDefault')->limit(10)->extend('TableSort');
   if ($mail) {
     $query->condition('mail', $mail);
   }
-  $record = $query->execute()->fetchAll();
+  $record = $query->execute();
   return $record;
-}
-
-/**
- * Build table showing pending invites.
- */
-function _user_external_invite_pending_invites_table() {
-  $build = array();
-  $pending = _user_external_invite_pending_invites();
-  if (!empty($pending)) {
-    $build['title']['#markup'] = '<h2>Pending Invites</h2>';
-    $build['table']['#theme'] = 'table';
-    $build['table']['#header'] = array(
-      t('Email'),
-      t('Role'),
-      t('Expires'),
-      t('Inviter'),
-      t('Status'),
-      t('Actions'),
-    );
-
-    $rids = variable_get('user_external_invite_roles', NULL);
-    foreach ($rids as $rid) {
-      $roles[$rid] = _user_external_invite_role_name_from_rid($rid);
-    }
-
-    foreach ($pending as $r) {
-      $inviter = user_load($r->uid);
-      $rows[] = array(
-        $r->mail,
-        $roles[$r->rid],
-        format_date($r->expire, 'short'),
-        $inviter->mail,
-        $r->status,
-        l(t('Cancel invite'), 'admin/people/invite/cancel/' . $r->mail),
-      );
-    }
-    $build['table']['#rows'] = $rows;
-  }
-  return $build;
 }
 
 /**

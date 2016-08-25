@@ -169,7 +169,7 @@ function user_external_invite_form($form, &$form_state) {
 
   $form['submit'] = array(
     '#type' => 'submit',
-    '#value' => t('Submit'),
+    '#value' => t('Send Invites'),
   );
   return $form;
 }
