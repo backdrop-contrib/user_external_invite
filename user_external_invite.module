@@ -106,7 +106,7 @@ function user_external_invite_pending_invites_form($form, &$form_state) {
 
   // Add select list for choosing operations.
   $select_options = array(
-    'user_external_invite_cancel_invites' => 'Cancel Invites',
+    0 => 'Cancel Invites'
   );
 
   $form['operations']['select'] = array(
@@ -137,6 +137,8 @@ function user_external_invite_pending_invites_form($form, &$form_state) {
   }
 
   $pending = _user_external_invite_pending_invites(NULL, $headers);
+  $rows = array();
+
   while ($r = $pending->fetchObject()){
     $inviter = user_load($r->uid);
     $rows[] = array(
@@ -175,7 +177,7 @@ function user_external_invite_pending_invites_form_submit(&$form, &$form_state) 
 
   $table_options = $form['table']['#options'];
   $selected_options = $form_state['input']['table'];
-  $operation = $form_state['values']['select'];
+  //$operation = $form_state['values']['select'];
   $ids = array();
 
   // Loop through selected rows and match with invite IDs.
@@ -185,8 +187,9 @@ function user_external_invite_pending_invites_form_submit(&$form, &$form_state) 
     }
   }
 
-  // Pass IDs to submit callback function.
-  call_user_func($operation, $ids);
+  // Pass IDs into corresponding callback function.
+  // No logic yet since only one option to cancel invites.
+  user_external_invite_cancel_invites($ids);
 }
 
 /**
