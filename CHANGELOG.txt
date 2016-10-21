@@ -6,3 +6,4 @@ Issue #2820173: Add changelog.txt file to repository
 Issue #2820219 by afinnarn: Remove License.txt from project
 Issue #2816077 by darshi: Deleting roles can result in blank options in invite form
 Issue #2816091 by darshi, afinnarn: Two action buttons on the invites page is confusing
+Issue #2816653 by darshi, afinnarn: Form Items Need Better Help Text/Descriptions

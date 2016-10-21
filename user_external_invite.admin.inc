@@ -41,7 +41,8 @@ function user_external_invite_settings_form() {
   // Days invite valid for.
   $form['user_external_invite_days_valid_for'] = array(
     '#type' => 'textfield',
-    '#title' => t('Number of days invites are valid for'),
+    '#title' => t('Number of days invites are valid'),
+    '#description' => t("Invites are set to expire so many days after they are created. If a user hasn't accepted the invite by that time, then you will have to send a new invite to grant that user a role."),
     '#default_value' => variable_get('user_external_invite_days_valid_for', 5),
     '#element_validate' => array('element_validate_number'),
     '#maxlength' => 3,
@@ -51,6 +52,7 @@ function user_external_invite_settings_form() {
   $form['user_external_invite_delete_old_invites'] = array(
     '#type' => 'textfield',
     '#title' => t('Invite Deletion'),
+    '#description' => t("Invites are deleted during a cron run after they have passed their expire time. Defaults to 30 days (2592000 seconds)."),
     '#default_value' => 60*60*24*30,
     '#size' => 60,
     '#element_validate' => array('element_validate_number'),
