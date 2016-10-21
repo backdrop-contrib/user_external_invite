@@ -75,9 +75,9 @@ function user_external_invite_settings_form() {
     '#states' => array(
       'visible' => array(
         ':input[name="user_external_invite_use_universal_from_email"]' => array('checked' => TRUE),
-        'required' => array(
-          ':input[name="user_external_invite_use_universal_from_email"]' => array('checked' => TRUE),
-        ),
+      ),
+      'required' => array(
+        ':input[name="user_external_invite_use_universal_from_email"]' => array('checked' => TRUE),
       ),
     ),
   );
