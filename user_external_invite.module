@@ -98,30 +98,6 @@ function user_external_invite_page() {
 function user_external_invite_pending_invites_form($form, &$form_state) {
   $form = array();
 
-  // Add container for operations functionality.
-  $form['operations'] = array(
-    '#type' => 'fieldset',
-    '#title' => 'Operations',
-  );
-
-  // Add select list for choosing operations.
-  $select_options = array(
-    0 => 'Cancel Invites'
-  );
-
-  $form['operations']['select'] = array(
-    '#type' => 'select',
-    //'#title' => t('Operations'),
-    '#options' => $select_options,
-    '#default_value' => $select_options[0],
-  );
-
-  // Add submit button for operations.
-  $form['operations']['submit'] = array(
-    '#type' => 'submit',
-    '#value' => t('Submit'),
-  );
-
   $headers = array(
     'id' => t('ID'),
     'mail' => t('Email'),
@@ -151,18 +127,45 @@ function user_external_invite_pending_invites_form($form, &$form_state) {
     );
   }
 
-  $form['table'] = array(
-    '#type' => 'tableselect',
-    '#header' => $headers,
-    '#options' => $rows,
-    '#suffix' => empty($rows) ? 'No pending invites.' : '',
-    '#weight' => 10,
-  );
+  // Add operations only if rows are present.
+  if (!empty($rows)) {
+    // Add container for operations functionality.
+    $form['operations'] = array(
+      '#type' => 'fieldset',
+      '#title' => 'Operations',
+    );
 
-  $form['pager'] = array(
-    '#theme' => 'pager',
-    '#weight' => 11,
-  );
+    // Add select list for choosing operations.
+    $select_options = array(
+      0 => 'Cancel Invites'
+    );
+
+    $form['operations']['select'] = array(
+      '#type' => 'select',
+      //'#title' => t('Operations'),
+      '#options' => $select_options,
+      '#default_value' => $select_options[0],
+    );
+
+    // Add submit button for operations.
+    $form['operations']['submit'] = array(
+      '#type' => 'submit',
+      '#value' => t('Submit'),
+    );
+
+    $form['table'] = array(
+      '#type' => 'tableselect',
+      '#header' => $headers,
+      '#options' => $rows,
+      '#suffix' => empty($rows) ? 'No pending invites.' : '',
+      '#weight' => 10,
+    );
+
+    $form['pager'] = array(
+      '#theme' => 'pager',
+      '#weight' => 11,
+    );
+  }
 
   return $form;
 }
