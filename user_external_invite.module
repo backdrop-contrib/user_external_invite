@@ -513,7 +513,7 @@ function user_external_invite_grant_invite($key, $mail, $account) {
     _user_external_invite_send_inviter_confirmation($invite['uid'], $invite['mail'], $invite['rid']);
 
     // Once granted, change status of invite in database.
-    _user_external_invite_change_invite_status($mail, 'granted');
+    _user_external_invite_change_invite_status($mail, 'Granted');
   }
   else {
     drupal_set_message(
@@ -738,7 +738,8 @@ function _user_external_invite_load_related_invites($entity) {
 
 /**
  * Implements hook_user_role_delete().
- * Removes role from invited roles upon deletion
+ *
+ * Removes role from invited roles upon deletion.
  */
 function user_external_invite_user_role_delete($role) {
   $rids = variable_get('user_external_invite_roles', NULL);
@@ -746,5 +747,20 @@ function user_external_invite_user_role_delete($role) {
   if (in_array($removed_id, $rids)) {
     unset($rids[$removed_id]);
     variable_set('user_external_invite_roles', $rids);
+  }
+}
+
+/**
+ * Implements hook_system_info_alter().
+ *
+ * Prevent disabling of module if pending invites are present.
+ */
+function user_external_invite_system_info_alter(&$info, $file, $type) {
+  if ($type == 'module' && $file->name == 'user_external_invite') {
+    if ($result = db_query('SELECT * FROM {user_external_invite} WHERE status = :status', array(':status' => 'Pending'))->fetchAll()) {
+      $info['required'] = TRUE;
+      $explanation = t('This module can\'t be disabled when there are invites pending. See a list of pending invites here - <a href="@invites">Invites list</a>', array('@invites' => url('admin/people/invite')));
+      $info['explanation'] = $explanation;
+    }
   }
 }

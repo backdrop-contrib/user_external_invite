@@ -9,3 +9,4 @@ Issue #2816091 by darshi, afinnarn: Two action buttons on the invites page is co
 Issue #2816653 by darshi, afinnarn: Form Items Need Better Help Text/Descriptions
 Issue #2820720 by darshi: Error on selecting universal email
 Issue #2816659 by darshi, afinnarn: A default role to invite can be selected without having that role included on Invite page
+Issue #2822572 by darshi, afinnarn: Prevent disabling module if invites are pending
