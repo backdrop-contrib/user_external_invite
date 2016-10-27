@@ -133,6 +133,13 @@ function user_external_invite_settings_form() {
  * Form validation handler for user external invite settings form.
  */
 function user_external_invite_settings_form_validate($form, &$form_state) {
+  // Check if Default Role to Invite is set and is one of the roles that can be invited.
+  if (isset($form_state['values']['user_external_invite_default_role'])) {
+    if (!in_array($form_state['values']['user_external_invite_default_role'], $form_state['values']['user_external_invite_roles'])) {
+      form_set_error('user_external_invite_default_role', t('Default role can only be one of the roles selected to invite.'));
+    }
+  }
+
   // Only validate the email if it is being used.
   if ($form_state['values']['user_external_invite_use_universal_from_email']) {
     if (valid_email_address($form_state['values']['user_external_invite_universal_from_email'])) {
