@@ -53,7 +53,7 @@ function user_external_invite_settings_form() {
     '#type' => 'textfield',
     '#title' => t('Invite Deletion'),
     '#description' => t("Invites are deleted during a cron run after they have passed their expire time. Defaults to 30 days (2592000 seconds)."),
-    '#default_value' => 60*60*24*30,
+    '#default_value' => variable_get('user_external_invite_delete_old_invites', 60*60*24*30),
     '#size' => 60,
     '#element_validate' => array('element_validate_number'),
     '#required' => TRUE,
