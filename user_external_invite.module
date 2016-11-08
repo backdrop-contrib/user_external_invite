@@ -108,10 +108,12 @@ function user_external_invite_pending_invites_form($form, &$form_state) {
   );
 
   $rids = variable_get('user_external_invite_roles', NULL);
-  foreach ($rids as $rid) {
-    $roles[$rid] = _user_external_invite_role_name_from_rid($rid);
+  $rids = variable_get('user_external_invite_roles', NULL);
+  if (!empty($rids)) {
+    foreach ($rids as $rid) {
+      $roles[$rid] = _user_external_invite_role_name_from_rid($rid);
+    }
   }
-
   $pending = _user_external_invite_pending_invites(NULL, $headers);
   $rows = array();
 

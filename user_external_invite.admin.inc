@@ -160,38 +160,45 @@ function user_external_invite_form($form, &$form_state) {
   $role_options = array();
   $rids = variable_get('user_external_invite_roles', NULL);
 
-  foreach ($rids as $rid) {
-    $role_options[$rid] = _user_external_invite_role_name_from_rid($rid);
+  if (empty($rids)) {
+    drupal_set_message(t('Your site is not yet configured to invite users. Contact the site administrator to configure the invite feature.'), 'status');
   }
-  asort($role_options);
+  else {
+    foreach ($rids as $rid) {
+      $role_options[$rid] = _user_external_invite_role_name_from_rid($rid);
+    }
+    asort($role_options);
 
-  $form['rid'] = array(
-    '#title' => t('Role'),
-    '#type' => 'radios',
-    '#options' => $role_options,
-    '#default_value' => variable_get('user_external_invite_default_role', key($role_options)),
-    '#required' => TRUE,
-  );
-  $form['email'] = array(
-    '#title' => t('Email addresses'),
-    '#type' => 'textarea',
-    '#description' => t('Comma separated list of email addresses that are sent the invitation email.'),
-    '#required' => TRUE,
-  );
+    $form['rid'] = array(
+      '#title' => t('Role'),
+      '#type' => 'radios',
+      '#options' => $role_options,
+      '#default_value' => variable_get('user_external_invite_default_role', key($role_options)),
+      '#required' => TRUE,
+    );
+    $form['email'] = array(
+      '#title' => t('Email addresses'),
+      '#type' => 'textarea',
+      '#description' => t('Comma separated list of email addresses that are sent the invitation email.'),
+      '#required' => TRUE,
+    );
 
-  $form['custom_message'] = array(
-    '#title' => t('Custom message'),
-    '#type' => 'textarea',
-    '#cols' => 40,
-    '#rows' => 5,
-    '#description' => t('If added, the custom message will be included before the standard template.  Can be left blank.'),
-  );
+    $form['custom_message'] = array(
+      '#title' => t('Custom message'),
+      '#type' => 'textarea',
+      '#cols' => 40,
+      '#rows' => 5,
+      '#description' => t('If added, the custom message will be included before the standard template.  Can be left blank.'),
+    );
 
-  $form['submit'] = array(
-    '#type' => 'submit',
-    '#value' => t('Send Invites'),
-  );
-  return $form;
+    $form['submit'] = array(
+      '#type' => 'submit',
+      '#value' => t('Send Invites'),
+    );
+    return $form;  
+  }
+
+  
 }
 
 /**
