@@ -14,3 +14,4 @@ Issue #2824541 by darshi: Can not change Invite Deletion value
 Issue #2822401 by darshi: On Install All Roles Are Available to Invite
 Issue #2649660 by naresh.bavaskar, afinnarn: Create Warning or Notice if Changing Roles When There Are Current Active Invite
 Issue #2825035 by darshi, afinnarn: Add Expiration Information to Invitation Emails
+Issue #2826114 by afinnarn: Add .gitignore with exclusion of patch files
