@@ -23,27 +23,32 @@ function user_external_invite_schema() {
         'type' => 'varchar',
         'length' => 254,
         'not null' => TRUE,
+        'default' => variable_get('site_mail', 'admin@example.com'),
       ),
       'rid' => array(
         'description' => 'Role ID to be granted',
         'type' => 'int',
         'not null' => TRUE,
+        'default' => 2,
       ),
       'expire' => array(
         'description' => 'Valid until unix timestamp',
         'type' => 'int',
         'not null' => TRUE,
+        'default' => REQUEST_TIME + (60 * 60 * 24 * 5),
       ),
       'status' => array(
         'description' => 'Status of the Invitation',
         'type' => 'varchar',
         'length' => 254,
         'not null' => TRUE,
+        'default' => 'Pending',
       ),
       'uid' => array(
         'description' => 'User ID of who sent the invite',
         'type' => 'int',
         'not null' => TRUE,
+        'default' => 1,
       ),
       'message' => array(
         'description' => 'Custom message included with invite',
@@ -118,13 +123,16 @@ To access and edit this site:
  * Add status row to table.
  */
 function user_external_invite_update_7001() {
-  $spec = array(
-    'description' => 'Status of the Invitation',
-    'type' => 'varchar',
-    'length' => 254,
-    'not null' => TRUE,
-  );
-  db_add_field('user_external_invite', 'status', $spec);
+  if (!db_field_exists('user_external_invite','status')) {
+    $spec = array(
+      'description' => 'Status of the Invitation',
+      'type' => 'varchar',
+      'length' => 254,
+      'not null' => TRUE,
+      'default' => 'Pending',
+    );
+    db_add_field('user_external_invite', 'status', $spec);
+  }
 }
 
 /**
