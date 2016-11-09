@@ -661,6 +661,10 @@ function user_external_invite_token_info() {
     'name' => t('Custom Message'),
     'description' => t('Returns custom message for the invite'),
   );
+  $info['invite_expiration'] = array(
+    'name' => t('Invite Expiration'),
+    'description' => t('Returns expiration time of invite.'),
+  );
   return array(
     'types' => $types,
     'tokens' => array(
@@ -709,6 +713,10 @@ function user_external_invite_tokens($type, $tokens, array $data = array(), arra
 
         case 'invite_custom':
           $replacements[$original] = $data['ext-invite']->message;
+          break;
+
+        case 'invite_expiration':
+          $replacements[$original] = date('F j, Y g:i', $data['ext-invite']->expire) . ' '. date_default_timezone_get();
           break;
 
       }
