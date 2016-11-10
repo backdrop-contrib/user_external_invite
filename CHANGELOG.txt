@@ -1,6 +1,10 @@
 
 user_external_invite 7.x-1.x-dev
 ==================
+
+
+user_external_invite 7.x-1.1
+==================
 Issue #2820175 by afinnarn: Add a license to the project
 Issue #2820173 by afinnarn: Add changelog.txt file to repository
 Issue #2820219 by afinnarn: Remove License.txt from project
