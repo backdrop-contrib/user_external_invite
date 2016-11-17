@@ -55,12 +55,28 @@ function user_external_invite_menu() {
     'type' => MENU_NORMAL_ITEM,
   );
   $items['admin/people/invite'] = array(
-    'title' => 'Invite user',
+    'title' => 'Invite users',
     'page callback' => 'user_external_invite_page',
     'page arguments' => array('user_external_invite_form'),
     'access arguments' => array('invite new user'),
     'file' => 'user_external_invite.admin.inc',
-    'type' => MENU_LOCAL_ACTION,
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 3,
+  );
+  $items['admin/people/invite/invite'] = array(
+    'title' => 'Invite users',
+    'page callback' => 'user_external_invite_page',
+    'page arguments' => array('user_external_invite_form'),
+    'access arguments' => array('invite new user'),
+    'file' => 'user_external_invite.admin.inc',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+  );
+  $items['admin/people/invite/operations'] = array(
+    'title' => 'Manage invites',
+    'page callback' => 'user_external_invite_operations_page',
+    'page arguments' => array('user_external_invite_pending_invites_form'),
+    'access arguments' => array('invite new user'),
+    'type' => MENU_LOCAL_TASK,
   );
   $items['user-external/accept-invite'] = array(
     'title' => 'Accept an invite',
@@ -76,6 +92,13 @@ function user_external_invite_menu() {
  */
 function user_external_invite_page() {
   $build['form'] = drupal_get_form('user_external_invite_form');
+  return $build;
+}
+
+/**
+ * Page callback for admin/people/invite/operations.
+ */
+function user_external_invite_operations_page() {
   $build['invites'] = drupal_get_form('user_external_invite_pending_invites_form');
   return $build;
 }
@@ -95,7 +118,6 @@ function user_external_invite_pending_invites_form($form, &$form_state) {
     'status' => t('Status'),
   );
 
-  $rids = variable_get('user_external_invite_roles', NULL);
   $rids = variable_get('user_external_invite_roles', NULL);
   if (!empty($rids)) {
     foreach ($rids as $rid) {
@@ -119,6 +141,7 @@ function user_external_invite_pending_invites_form($form, &$form_state) {
 
   // Add operations only if rows are present.
   if (!empty($rows)) {
+
     // Add container for operations functionality.
     $form['operations'] = array(
       '#type' => 'fieldset',
@@ -155,6 +178,9 @@ function user_external_invite_pending_invites_form($form, &$form_state) {
       '#theme' => 'pager',
       '#weight' => 11,
     );
+  }
+  else {
+    drupal_set_message(t('No invites available.'), 'status');
   }
 
   return $form;
