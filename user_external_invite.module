@@ -72,18 +72,6 @@ function user_external_invite_menu() {
 }
 
 /**
- * Page callback for admin/people/invite/cancel/%.
- *
- * Cancels a invite.
- */
-function user_external_invite_cancel_invite($mail) {
-  // @todo verify $mail is valid and invite currently exists.
-  _user_external_invite_change_invite_status($mail, 'canceled');
-  drupal_set_message(t('Invite for !mail successfully canceled.', array('!mail' => $mail)));
-  drupal_goto('admin/people/invite');
-}
-
-/**
  * Page callback for admin/people/invite.
  */
 function user_external_invite_page() {
@@ -117,7 +105,7 @@ function user_external_invite_pending_invites_form($form, &$form_state) {
   $pending = _user_external_invite_pending_invites(NULL, $headers);
   $rows = array();
 
-  while ($r = $pending->fetchObject()){
+  while ($r = $pending->fetchObject()) {
     $inviter = user_load($r->uid);
     $rows[] = array(
       'id' => $r->id,
@@ -205,7 +193,7 @@ function user_external_invite_pending_invites_form_submit(&$form, &$form_state) 
 function user_external_invite_cancel_invites($ids = array()) {
   // If no IDs passed then return with error message.
   if (empty($ids)) {
-    drupal_set_message('No invites selected for operation. Please select desired invites and try again.', 'error');
+    drupal_set_message(t('No invites selected for operation. Please select desired invites and try again.'), 'error');
     return;
   }
 
@@ -716,7 +704,7 @@ function user_external_invite_tokens($type, $tokens, array $data = array(), arra
           break;
 
         case 'invite_expiration':
-          $replacements[$original] = date('F j, Y g:i', $data['ext-invite']->expire) . ' '. date_default_timezone_get();
+          $replacements[$original] = date('F j, Y g:i', $data['ext-invite']->expire) . ' ' . date_default_timezone_get();
           break;
 
       }
