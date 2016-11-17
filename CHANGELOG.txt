@@ -3,6 +3,7 @@ user_external_invite 7.x-1.x-dev
 ==================
 Issue #2828060 by darshi.addweb: Fixing typo in user_external_invite.admin.inc file
 Issue #2826585 by naresh.bavaskar, darshi.addweb: Code cleanup and coding standard
+Issue #2825931 by darshi.addweb, afinnarn: UI Improvement for Invite Screen
 
 user_external_invite 7.x-1.1
 ==================
