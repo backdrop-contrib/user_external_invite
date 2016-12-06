@@ -567,7 +567,14 @@ function user_external_invite_accept_invite() {
 function user_external_invite_grant_invite($key, $mail, $account) {
   $grant_rid = _user_external_invite_dehash($key, $mail);
 
-  if ($grant_rid) {
+  // Allow for other actions and checks before a role is granted to a user.
+  // If any hook returns a message, then the role will not be granted.
+  $error_messages = module_invoke_all('user_external_invite_pre_grant_invite', $account, $grant_rid);
+
+  if ($grant_rid && !$error_messages) {
+    // Set message to user that role was granted.
+    drupal_set_message(t('Invite accepted!'));
+
     // Check to see if the user already has the role.  Because the email
     // Used in the invite is not always = to LDAP, they could already be
     // In the role.
@@ -576,12 +583,14 @@ function user_external_invite_grant_invite($key, $mail, $account) {
     if (in_array($role->name, $user->roles)) {
       return;
     }
+
     db_insert('users_roles')
       ->fields(array(
         'uid' => $account->uid,
         'rid' => $grant_rid,
       ))
       ->execute();
+
     // Send acceptance email.
     _user_external_invite_send_invite_accepted_mail($grant_rid, $account->mail);
 
@@ -594,10 +603,15 @@ function user_external_invite_grant_invite($key, $mail, $account) {
     // Once granted, change status of invite in database.
     _user_external_invite_change_invite_status($mail, 'Granted');
   }
+  // If messages from pre_grant_invite exists, combine them and print to screen.
+  elseif ($error_messages) {
+    foreach ($error_messages as $message) {
+      drupal_set_message(t($message), 'error');
+    }
+  }
+  // Provide generic error message if no other messages exist.
   else {
-    drupal_set_message(
-      t('Invite invalid or has expired! If you feel you have received this in error, please contact a site owner.'),
-      'error');
+    drupal_set_message( t('Invite invalid or has expired! If you feel you have received this in error, please contact a site owner.'), 'error');
   }
 }
 
@@ -685,7 +699,6 @@ function _user_external_invite_dehash($key, $mail) {
   }
   $expected_hash = _user_external_invite_calculate_hash($result['rid'], $result['mail'], $result['expire']);
   if ($key == $expected_hash) {
-    drupal_set_message(t('Invite accepted!'));
     return $result['rid'];
   }
   return FALSE;
