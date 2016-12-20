@@ -1,6 +1,7 @@
 
 user_external_invite 7.x-1.x-dev
 ==================
+Issue #2835739 by darshi.addweb, afinnarn: Add confirmation on manage invites
 
 user_external_invite 7.x-1.2
 ==================

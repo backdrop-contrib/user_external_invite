@@ -139,64 +139,90 @@ function user_external_invite_pending_invites_form($form, &$form_state) {
     );
   }
 
-  // Add operations only if rows are present.
-  if (!empty($rows)) {
+  // Determine whether or not to display confirm form message.
+  if (!isset($form_state['storage']['confirm'])) {
 
-    // Add container for operations functionality.
-    $form['operations'] = array(
-      '#type' => 'fieldset',
-      '#title' => 'Operations',
-    );
+    // Add operations only if rows are present.
+    if (!empty($rows)) {
 
-    // Add select list for choosing operations.
-    $select_options = array(
-      'cancel' => 'Cancel Invites',
-      'resend' => 'Resend Invites',
-    );
+      // Add container for operations functionality.
+      $form['operations'] = array(
+        '#type' => 'fieldset',
+        '#title' => 'Operations',
+      );
 
-    $form['operations']['select'] = array(
-      '#type' => 'select',
-      '#options' => $select_options,
-      '#default_value' => $select_options['cancel'],
-    );
+      // Add select list for choosing operations.
+      $select_options = array(
+        'cancel' => 'Cancel Invites',
+        'resend' => 'Resend Invites',
+      );
 
-    $form['operations']['resend_message'] = array(
-      '#type' => 'textarea',
-      '#title' => t('Custom Message'),
-      '#cols' => 40,
-      '#rows' => 5,
-      '#description' => t('Message sent to users being re-invited. The rest of the email will include the "Invitation Email Template" text.'),
-      '#states' => array(
-        'visible' => array(
-          ':input[name="select"]' => array('value' => 'resend'),
+      $form['operations']['select'] = array(
+        '#type' => 'select',
+        '#options' => $select_options,
+        '#default_value' => $select_options['cancel'],
+      );
+
+      $form['operations']['resend_message'] = array(
+        '#type' => 'textarea',
+        '#title' => t('Custom Message'),
+        '#cols' => 40,
+        '#rows' => 5,
+        '#description' => t('Message sent to users being re-invited. The rest of the email will include the "Invitation Email Template" text.'),
+        '#states' => array(
+          'visible' => array(
+            ':input[name="select"]' => array('value' => 'resend'),
+          ),
         ),
-      ),
-    );
+      );
 
-    // Add submit button for operations.
-    $form['operations']['submit'] = array(
-      '#type' => 'submit',
-      '#value' => t('Submit'),
-    );
+      // Add submit button for operations.
+      $form['operations']['submit'] = array(
+        '#type' => 'submit',
+        '#value' => t('Submit'),
+      );
 
-    $form['table'] = array(
-      '#type' => 'tableselect',
-      '#header' => $headers,
-      '#options' => $rows,
-      '#suffix' => empty($rows) ? 'No pending invites.' : '',
-      '#weight' => 10,
-    );
+      $form['table'] = array(
+        '#type' => 'tableselect',
+        '#header' => $headers,
+        '#options' => $rows,
+        '#suffix' => empty($rows) ? 'No pending invites.' : '',
+        '#weight' => 10,
+      );
 
-    $form['pager'] = array(
-      '#theme' => 'pager',
-      '#weight' => 11,
-    );
+      $form['pager'] = array(
+        '#theme' => 'pager',
+        '#weight' => 11,
+      );
+
+    }
+    else {
+      drupal_set_message(t('No invites available.'), 'status');
+    }
+    return $form;
   }
+  // Display confirm form message to user.
   else {
-    drupal_set_message(t('No invites available.'), 'status');
+    // Get operation being performed for message to user.
+    $operation = $form_state['values']['select'];
+
+    // Count the number of invites for user message.
+    // @todo It would be nice to do this in a more concise way.
+    $num_invites = 0;
+    foreach ($form_state['input']['table'] as $value) {
+      if ($value != NULL) {
+        $num_invites += 1;
+      }
+    }
+
+    // Determine if there are multiple invites for message display.
+    $plural = $num_invites > 1 ? 'invites' : 'invite';
+
+    // Need to pass current path and message variables to confirm_form() function.
+    $path = current_path();
+    return confirm_form($form, 'Do you really want to ' . $operation . ' invites?', $path, $description = 'By proceeding you will ' . $operation . ' ' . $num_invites . ' ' . $plural . '. This action can not be undone.', 'Proceed', 'Cancel');
   }
 
-  return $form;
 }
 
 /**
@@ -206,43 +232,57 @@ function user_external_invite_pending_invites_form($form, &$form_state) {
  * @param $form_state
  */
 function user_external_invite_pending_invites_form_submit(&$form, &$form_state) {
-  // Define variables.
-  $table_options = $form['table']['#options'];
-  $selected_options = $form_state['input']['table'];
-  $operation = $form_state['values']['select'];
-  $message = $form_state['values']['resend_message'];
-  $ids = array();
+  // If the user has confirmed the form operation, proceed.
+  if (isset($form_state['storage']['confirm'])) {
 
-  // Loop through selected rows and match with invite IDs.
-  foreach ($selected_options as $key => $option) {
-    if ($option != NULL) {
-      $ids[] = $table_options[$key]['id'];
+    // Define variable.
+    $table_options = $form_state['storage']['form']['table']['#options'];
+    $selected_options = $form_state['storage']['form_state']['input']['table'];
+    $operation = $form_state['storage']['form_state']['values']['select'];
+    $message = $form_state['storage']['form_state']['values']['resend_message'];
+    $ids = array();
+
+    // Loop through selected rows and match with invite IDs.
+    foreach ($selected_options as $key => $option) {
+      if ($option != NULL) {
+        $ids[] = $table_options[$key]['id'];
+      }
+    }
+
+    // If no IDs passed then return with error message.
+    if (empty($ids)) {
+      drupal_set_message(t('No invites selected for operation. Please select desired invites and try again.'), 'error');
+      return;
+    }
+
+    // Pass IDs into corresponding callback function.
+    switch ($operation) {
+      case 'cancel':
+        user_external_invite_cancel_invites($ids);
+        break;
+      case 'resend':
+        // Adding additional message to send to invitees.
+        user_external_invite_resend_invites($ids, $message);
+
+        // Set message to user about successful resent invites.
+        // @todo Handle this better for possible errors. We're assuming invites were sent.
+        $num_invites = count($ids);
+        $plural_invites = $num_invites > 1 ? 'invites' : 'invite';
+        drupal_set_message(t('Successfully resent :number user :invites.', array(
+          ':number' => $num_invites,
+          ':invites' => $plural_invites
+        )));
+        break;
+      default:
+        break;
     }
   }
-
-  // If no IDs passed then return with error message.
-  if (empty($ids)) {
-    drupal_set_message(t('No invites selected for operation. Please select desired invites and try again.'), 'error');
-    return;
-  }
-
-  // Pass IDs into corresponding callback function.
-  switch ($operation) {
-    case 'cancel':
-      user_external_invite_cancel_invites($ids);
-      break;
-    case 'resend':
-      // Adding additional message to send to invitees.
-      user_external_invite_resend_invites($ids, $message);
-
-      // Set message to user about successful resent invites.
-      // @todo Handle this better for possible errors. We're assuming invites were sent.
-      $num_invites = count($ids);
-      $plural_invites = $num_invites > 1 ? 'invites' : 'invite';
-      drupal_set_message(t('Successfully resent :number user :invites.', array(':number' => $num_invites, ':invites' => $plural_invites)));
-      break;
-    default:
-      break;
+  // If the user has yet to confirm the operation, then ask them to proceed.
+  else {
+    $form_state['storage']['form_state'] = $form_state;
+    $form_state['storage']['form'] = $form;
+    $form_state['storage']['confirm'] = TRUE; // This will cause the form to be rebuilt returning to the confirm part of the form.
+    $form_state['rebuild'] = TRUE;
   }
 }
 
@@ -275,7 +315,10 @@ function user_external_invite_cancel_invites($ids = array()) {
   db_delete('user_external_invite')
     ->condition('id', $ids, 'IN')
     ->execute();
-  drupal_set_message(t('Deleted :ids user :invites.', array(':ids' => count($ids), ':invites' => count($ids) > 1 ? 'invites' : 'invite')));
+  drupal_set_message(t('Deleted :ids user :invites.', array(
+    ':ids' => count($ids),
+    ':invites' => count($ids) > 1 ? 'invites' : 'invite'
+  )));
 }
 
 /**
@@ -611,7 +654,7 @@ function user_external_invite_grant_invite($key, $mail, $account) {
   }
   // Provide generic error message if no other messages exist.
   else {
-    drupal_set_message( t('Invite invalid or has expired! If you feel you have received this in error, please contact a site owner.'), 'error');
+    drupal_set_message(t('Invite invalid or has expired! If you feel you have received this in error, please contact a site owner.'), 'error');
   }
 }
 
@@ -717,7 +760,7 @@ function user_external_invite_cron() {
     ->execute();
 
   // Delete old invites after 30 days.
-  $expire_time = variable_get('user_external_invite_delete_old_invites', 60*60*24*30);
+  $expire_time = variable_get('user_external_invite_delete_old_invites', 60 * 60 * 24 * 30);
   db_delete('user_external_invite')
     ->condition('expire', REQUEST_TIME - $expire_time, '<')
     ->execute();
@@ -880,7 +923,9 @@ function user_external_invite_form_alter(&$form, &$form_state) {
     // Check to see if any invites are pending and what role ids are associated with them.
     if ($role_ids = db_query('SELECT rid FROM {user_external_invite} WHERE status = :status', array(':status' => 'Pending'))->fetchCol()) {
       // Print out role names to attach to warning message.
-      $role_names = array_map(function($a) {return _user_external_invite_role_name_from_rid($a);}, $role_ids);
+      $role_names = array_map(function ($a) {
+        return _user_external_invite_role_name_from_rid($a);
+      }, $role_ids);
       drupal_set_message(
         t('User Invites are still pending with roles of: :roles. Altering roles or permissions could interfere with the user invite process. Pending invites can be viewed at: <a href="' . base_path() . 'admin/people/invite">admin/people/invite</a>', array(':roles' => implode(', ', $role_names))), 'warning');
     }
