@@ -124,7 +124,7 @@ function user_external_invite_pending_invites_form($form, &$form_state) {
       $roles[$rid] = _user_external_invite_role_name_from_rid($rid);
     }
   }
-  $pending = _user_external_invite_pending_invites(NULL, $headers);
+  $pending = _user_external_invite_pending_invites(NULL);
   $rows = array();
 
   while ($r = $pending->fetchObject()) {
@@ -218,7 +218,8 @@ function user_external_invite_pending_invites_form($form, &$form_state) {
     // Determine if there are multiple invites for message display.
     $plural = $num_invites > 1 ? 'invites' : 'invite';
 
-    // Need to pass current path and message variables to confirm_form() function.
+    // Need to pass current path and message variables to
+    // confirm_form() function.
     $path = current_path();
     return confirm_form($form, 'Do you really want to ' . $operation . ' invites?', $path, $description = 'By proceeding you will ' . $operation . ' ' . $num_invites . ' ' . $plural . '. This action can not be undone.', 'Proceed', 'Cancel');
   }
@@ -228,8 +229,10 @@ function user_external_invite_pending_invites_form($form, &$form_state) {
 /**
  * Submit callback for user_external_invite_pending_invites_form().
  *
- * @param $form
- * @param $form_state
+ * @param array $form
+ *   The form being used to edit the node.
+ * @param array $form_state
+ *   The form state array.
  */
 function user_external_invite_pending_invites_form_submit(&$form, &$form_state) {
   // If the user has confirmed the form operation, proceed.
@@ -260,6 +263,7 @@ function user_external_invite_pending_invites_form_submit(&$form, &$form_state) 
       case 'cancel':
         user_external_invite_cancel_invites($ids);
         break;
+
       case 'resend':
         // Adding additional message to send to invitees.
         user_external_invite_resend_invites($ids, $message);
@@ -270,18 +274,22 @@ function user_external_invite_pending_invites_form_submit(&$form, &$form_state) 
         $plural_invites = $num_invites > 1 ? 'invites' : 'invite';
         drupal_set_message(t('Successfully resent :number user :invites.', array(
           ':number' => $num_invites,
-          ':invites' => $plural_invites
+          ':invites' => $plural_invites,
         )));
         break;
+
       default:
         break;
+
     }
   }
   // If the user has yet to confirm the operation, then ask them to proceed.
   else {
     $form_state['storage']['form_state'] = $form_state;
     $form_state['storage']['form'] = $form;
-    $form_state['storage']['confirm'] = TRUE; // This will cause the form to be rebuilt returning to the confirm part of the form.
+    // This will cause the form to be rebuilt
+    // returning to the confirm part of the form.
+    $form_state['storage']['confirm'] = TRUE;
     $form_state['rebuild'] = TRUE;
   }
 }
@@ -290,6 +298,7 @@ function user_external_invite_pending_invites_form_submit(&$form, &$form_state) 
  * Callback to resend invites.
  *
  * @param array $ids
+ *   The user external invite Ids.
  */
 function user_external_invite_resend_invites($ids = array(), $message = '') {
   // Grab row from db and pass to add invite function.
@@ -308,6 +317,7 @@ function user_external_invite_resend_invites($ids = array(), $message = '') {
  * Callback to cancel/remove pending invites.
  *
  * @param array $ids
+ *   Ids to be deleted.
  */
 function user_external_invite_cancel_invites($ids = array()) {
 
@@ -317,7 +327,7 @@ function user_external_invite_cancel_invites($ids = array()) {
     ->execute();
   drupal_set_message(t('Deleted :ids user :invites.', array(
     ':ids' => count($ids),
-    ':invites' => count($ids) > 1 ? 'invites' : 'invite'
+    ':invites' => count($ids) > 1 ? 'invites' : 'invite',
   )));
 }
 
@@ -335,8 +345,14 @@ function user_external_invite_user_external_invite_excluded_roles($roles) {
 
 /**
  * Get and return pending invites.
+ *
+ * @param null|string $mail
+ *   The email to search for pending invites.
+ *
+ * @return $record
+ *   Record of pending invite.
  */
-function _user_external_invite_pending_invites(string $mail = NULL, $headers) {
+function _user_external_invite_pending_invites($mail = NULL) {
   $query = db_select('user_external_invite', 'i')
     ->fields('i');
   $query = $query->extend('PagerDefault')->limit(10)->extend('TableSort');
@@ -619,8 +635,8 @@ function user_external_invite_grant_invite($key, $mail, $account) {
     drupal_set_message(t('Invite accepted!'));
 
     // Check to see if the user already has the role.  Because the email
-    // Used in the invite is not always = to LDAP, they could already be
-    // In the role.
+    // used in the invite is not always = to LDAP, they could already be
+    // in the role.
     global $user;
     $role = user_role_load($grant_rid);
     if (in_array($role->name, $user->roles)) {
@@ -649,7 +665,7 @@ function user_external_invite_grant_invite($key, $mail, $account) {
   // If messages from pre_grant_invite exists, combine them and print to screen.
   elseif ($error_messages) {
     foreach ($error_messages as $message) {
-      drupal_set_message(t($message), 'error');
+      drupal_set_message($message, 'error');
     }
   }
   // Provide generic error message if no other messages exist.
@@ -911,23 +927,33 @@ function user_external_invite_system_info_alter(&$info, $file, $type) {
 /**
  * Implements hook_form_alter().
  *
- * If there are still invites pending, then changing anything related to roles could interfere with the invite process.
+ * If there are still invites pending, then changing anything related to
+ * roles could interfere with the invite process.
  * Users should get a warning message to proceed with caution.
  *
- * @param $form
- * @param $form_state
+ * @param array $form
+ *   The form array passed to form_alter().
+ *
+ * @param array $form_state
+ *   The values of the current form's state.
  */
 function user_external_invite_form_alter(&$form, &$form_state) {
   // Only alter the roles and permissions forms.
   if ($form['#form_id'] == 'user_admin_permissions' || $form['#form_id'] == 'user_admin_roles') {
-    // Check to see if any invites are pending and what role ids are associated with them.
+    // Check to see if any invites are pending and
+    // what role ids are associated with them.
     if ($role_ids = db_query('SELECT rid FROM {user_external_invite} WHERE status = :status', array(':status' => 'Pending'))->fetchCol()) {
       // Print out role names to attach to warning message.
       $role_names = array_map(function ($a) {
         return _user_external_invite_role_name_from_rid($a);
       }, $role_ids);
       drupal_set_message(
-        t('User Invites are still pending with roles of: :roles. Altering roles or permissions could interfere with the user invite process. Pending invites can be viewed at: <a href="' . base_path() . 'admin/people/invite">admin/people/invite</a>', array(':roles' => implode(', ', $role_names))), 'warning');
+        t('User Invites are still pending with roles of: :roles. Altering roles or permissions could interfere with the user invite process. Pending invites can be viewed at: :urls',
+          array(
+            ':roles' => implode(', ', $role_names),
+            ':urls' => '<a href="' . base_path() . 'admin/people/invite">admin/people/invite</a>',
+          )
+        ), 'warning');
     }
   }
 }

@@ -53,7 +53,7 @@ function user_external_invite_settings_form() {
     '#type' => 'textfield',
     '#title' => t('Invite Deletion'),
     '#description' => t("Invites are deleted during a cron run after they have passed their expire time. Defaults to 30 days (2592000 seconds)."),
-    '#default_value' => variable_get('user_external_invite_delete_old_invites', 60*60*24*30),
+    '#default_value' => variable_get('user_external_invite_delete_old_invites', 60 * 60 * 24 * 30),
     '#size' => 60,
     '#element_validate' => array('element_validate_number'),
     '#required' => TRUE,
@@ -133,7 +133,8 @@ function user_external_invite_settings_form() {
  * Form validation handler for user external invite settings form.
  */
 function user_external_invite_settings_form_validate($form, &$form_state) {
-  // Check if Default Role to Invite is set and is one of the roles that can be invited.
+  // Check if Default Role to Invite is set
+  // and is one of the roles that can be invited.
   if (isset($form_state['values']['user_external_invite_default_role'])) {
     if (!in_array($form_state['values']['user_external_invite_default_role'], $form_state['values']['user_external_invite_roles'])) {
       form_set_error('user_external_invite_default_role', t('Default role can only be one of the roles selected to invite.'));
@@ -148,7 +149,6 @@ function user_external_invite_settings_form_validate($form, &$form_state) {
     form_set_error('user_external_invite_universal_from_email', t('Invalid email.'));
   }
 }
-
 
 /**
  * Form to invite a new user as a site owner or content editor.
@@ -195,10 +195,8 @@ function user_external_invite_form($form, &$form_state) {
       '#type' => 'submit',
       '#value' => t('Send Invites'),
     );
-    return $form;  
+    return $form;
   }
-
-  
 }
 
 /**

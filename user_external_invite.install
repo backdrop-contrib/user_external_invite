@@ -100,8 +100,7 @@ To accept this invitation:
 1) Go to [user_external_invite:invite_link]
 2) Login with your username and password.
 
-Upon completion, you will receive an email confirming your access. Please note that invite is only valid until [user_external_invite:invite_expiration]. You will have to contact the site owner if you haven\'t accepted the invite by that date.' );
-  
+Upon completion, you will receive an email confirming your access. Please note that invite is only valid until [user_external_invite:invite_expiration]. You will have to contact the site owner if you haven\'t accepted the invite by that date.');
   variable_set('user_external_invite_confirmation_template', 'We have received your request to grant [user_external_invite:invite_role] access to the following:
 
 [user_external_invite:invited_emails]
