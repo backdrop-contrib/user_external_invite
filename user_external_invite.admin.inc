@@ -82,8 +82,43 @@ function user_external_invite_settings_form() {
     ),
   );
 
-  // Message templates.
-  $form['user_external_invite_invite_template'] = array(
+  // Inviter email templates.
+  $form['inviter_template'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Inviter Templates'),
+    '#description' => t('Templates to notify inviter.'),
+    '#collapsible' => TRUE,
+    '#collapsed' => TRUE,
+  );
+
+  $form['inviter_template']['user_external_invite_confirmation_template'] = array(
+    '#title' => t('Invitation Confirmation'),
+    '#type' => 'textarea',
+    '#cols' => 40,
+    '#rows' => 5,
+    '#default_value' => variable_get('user_external_invite_confirmation_template'),
+    '#description' => t('Confirmation message sent to inviter confirming the invitation was sent.'),
+  );
+
+  $form['inviter_template']['user_external_invite_accepted_template'] = array(
+    '#title' => t('Invitation Accepted Email Template'),
+    '#type' => 'textarea',
+    '#cols' => 40,
+    '#rows' => 5,
+    '#default_value' => variable_get('user_external_invite_accepted_template'),
+    '#description' => t('Message sent to inviter when the invitee accepts an invite.'),
+  );
+
+  // Invitee email templates.
+  $form['invitee_template'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Invitee Templates'),
+    '#description' => t('Templates to notify invitee.'),
+    '#collapsible' => TRUE,
+    '#collapsed' => TRUE,
+  );
+
+  $form['invitee_template']['user_external_invite_invite_template'] = array(
     '#title' => t('Invitation Email Template'),
     '#type' => 'textarea',
     '#cols' => 40,
@@ -92,34 +127,16 @@ function user_external_invite_settings_form() {
     '#description' => t('Message sent to user being invited.'),
   );
 
-  $form['user_external_invite_confirmation_template'] = array(
-    '#title' => t('Invitation Confirmation'),
-    '#type' => 'textarea',
-    '#cols' => 40,
-    '#rows' => 5,
-    '#default_value' => variable_get('user_external_invite_confirmation_template'),
-    '#description' => t('Confirmation message sent to user who initiated the invitation confirming the invitation was sent.'),
-  );
-
-  $form['user_external_invite_accepted_template'] = array(
-    '#title' => t('Invitation Accepted Email Template'),
-    '#type' => 'textarea',
-    '#cols' => 40,
-    '#rows' => 5,
-    '#default_value' => variable_get('user_external_invite_accepted_template'),
-    '#description' => t('Message sent to user who initiated the invivation when the user accepts an invite.'),
-  );
-
-  $form['user_external_invite_accepted_confirmation_template'] = array(
+  $form['invitee_template']['user_external_invite_accepted_confirmation_template'] = array(
     '#title' => t('Invitation Accepted Confirmation Email Template'),
     '#type' => 'textarea',
     '#cols' => 40,
     '#rows' => 5,
     '#default_value' => variable_get('user_external_invite_accepted_confirmation_template'),
-    '#description' => t('Message sent to user being invited confirming the process was completed.'),
+    '#description' => t('Message sent to invitee confirming the process was completed.'),
   );
 
-  // @TODO: add warning email about expiring invititations.
+  // @TODO: add warning email about expiring invitations.
   $form['token_help']['content'] = array(
     '#type' => 'markup',
     '#token_types' => 'all',

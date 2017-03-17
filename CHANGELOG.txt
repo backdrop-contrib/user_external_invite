@@ -4,6 +4,7 @@ user_external_invite 7.x-1.x-dev
 Issue #2835739 by darshi.addweb, afinnarn: Add confirmation on manage invites
 Issue #2835531 by afinnarn: Add check for status field in user_external_invite_system_info_alter()
 Issue #2840380 by vinod_kc, afinnarn: Fix coding standard related errors
+Issue #2856824 by tejal.addweb, afinnarn: Separate out email templates on the config page
 
 user_external_invite 7.x-1.2
 ==================
