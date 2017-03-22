@@ -916,7 +916,7 @@ function user_external_invite_user_role_delete($role) {
  */
 function user_external_invite_system_info_alter(&$info, $file, $type) {
   if ($type == 'module' && $file->name == 'user_external_invite') {
-    if (db_field_exists('user_external_invite', 'status') && $result = db_query('SELECT * FROM {user_external_invite} WHERE status = :status', array(':status' => 'Pending'))->fetchAll()) {
+    if (db_field_exists('user_external_invite', 'status') && db_query('SELECT * FROM {user_external_invite} WHERE status = :status', array(':status' => 'Pending'))->fetchAll()) {
       $info['required'] = TRUE;
       $explanation = t('This module can\'t be disabled when there are invites pending. See a list of pending invites here - <a href="@invites">Invites list</a>', array('@invites' => url('admin/people/invite/operations')));
       $info['explanation'] = $explanation;
