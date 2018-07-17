@@ -136,7 +136,6 @@ function user_external_invite_settings_form() {
     '#description' => t('Message sent to invitee confirming the process was completed.'),
   );
 
-  // @TODO: add warning email about expiring invitations.
   $form['token_help']['content'] = array(
     '#type' => 'markup',
     '#token_types' => 'all',
