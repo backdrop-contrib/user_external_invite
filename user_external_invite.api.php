@@ -29,17 +29,17 @@ function hook_user_external_invite_excluded_roles($roles) {
  *   The user account that will be granted a role.
  * @param int $grant_rid
  *   The role id that the user account will be granted.
- *
  * @return string
  *   The error message shown to the user for why no role was granted.
+ *
  */
 function hook_user_external_invite_pre_grant_invite($account, $grant_rid) {
-  // If email is in a list of emails we don't want to grant roles to,
-  // prevent granting.
+  // If email is in a list of emails we don't want to grant roles to, prevent granting.
+
   // This is a fictional function you would have to implement in your module.
   $blocked_emails = your_module_check_blocked_emails();
 
   if (in_array($account->mail, $blocked_emails)) {
-    return t('The email associated with this account cannot be granted user roles.');
+    return 'The email associated with this account cannot be granted user roles.';
   }
 }
