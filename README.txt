@@ -1,63 +1,59 @@
-INTRODUCTION
-------------
+User External Invite
+========
 
-This module allows any user with the "invite new user" permission to send role 
-invites to an email address. This module assumes that you are using external 
-authentication (such as LDAP or Shibboleth) and that users receiving the invites 
-can already log into the website.
+This module provides functionality similar to GitHub's project invitations. 
+Backdrop users with the "invite new user" permission can send invitations 
+to any email address inviting the recipent to join the site with a specific 
+role. If the invited user ignores the invitation, it expires. Not having 
+accounts with default passwords improves site security and active user 
+tracking. The module assumes you are using external authentication like 
+SAML, LDAP or GoogleAuth and that users receiving the invite email can 
+already log into the website as an authenticated user.
 
-Upon receiving the invitation email, the user is directed to the user login 
+Upon receiving the invitation email, a user is directed to the user login 
 page. Upon successful authentication, the elevated role is automatically 
-granted.
+granted. 
 
-REQUIREMENTS
+This approach is helpful at large organizations where a someone's username 
+is often a lesser known combination of letters and numbers like kere7580. 
+
+
+Installation
 ------------
 
-This module requires the following modules:
+- Install this module using the official Backdrop CMS instructions at
+  https://docs.backdropcms.org/documentation/extend-with-modules.
 
-* Token (https://drupal.org/project/token)
+- Visit the configuration page under Administration > Configuration > People >
+  Invite (admin/config/people/user-external-invite/) and enter the required information.
 
-RECOMMENDED MODULES
+
+Issues
+------
+
+Bugs and Feature Requests should be reported in the Issue Queue:
+https://github.com/backdrop-contrib/user_external_invite/issues.
+
+
+Current Maintainers
 -------------------
 
-* LDAP (https://www.drupal.org/project/ldap)
-  Protocol to provide external authentication
-  
-* Shibboleth authentication (https://www.drupal.org/project/shib_auth)
-  Another protocol to provide external authentication
+- [Tim Stalker](https://github.com/johnquest)
+- [Kevin Reynen](https://github.com/kreynen)
 
-INSTALLATION
-------------
 
- * Install as you would normally install a contributed Drupal module. See:
-   https://drupal.org/documentation/install/modules-themes/modules-7
-   for further information.
+Credits
+-------
 
-CONFIGURATION
--------------
+- Ported to Backdrop CMS by [Tim Stalker](https://github.com/johnquest) and [Kevin Reynen](https://github.com/kreynen).
+- Originally written for Drupal by [Kevin Reynen](https://www.drupal.org/u/kreynen) and [Alex Finnarn](https://www.drupal.org/u/afinnarn).
+- Based on [Some Other project](https://github.com/example).
+- Sponsored by [University of Colorado](https://www.cu.edu).
 
-Administration page located at:
- Administration >> Configuration >> People >> Invite
- 
-NEEDS WORK
 
-TROUBLESHOOTING
----------------
+License
+-------
 
-NEEDS WORK
+This project is GPL-2.0 software.
+See the LICENSE.txt file in this directory for complete text.
 
-FAQ
----
-
-NEEDS WORK
-
-MAINTAINERS
------------
-
-Current maintainers: 
- * Kevin Reynen (https://www.drupal.org/u/kreynen)
- * Alex Finnarn (https://www.drupal.org/u/afinnarn)
- 
-This project has been sponsored by:
- * University of Colorado at Boulder 
-   (https://www.drupal.org/u/university-of-colorado-boulder)
