@@ -16,7 +16,7 @@ function user_external_invite_drush_command() {
       'email' => 'Email address to invite',
       'role' => 'Role to grant',
     ),
-    'bootstrap' => DRUSH_BOOTSTRAP_DRUPAL_ROOT,
+    'bootstrap' => DRUSH_BOOTSTRAP_BACKDROP_ROOT,
     'options' => array(),
   );
   return $items;

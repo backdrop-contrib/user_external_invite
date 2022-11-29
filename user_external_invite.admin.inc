@@ -174,11 +174,11 @@ function user_external_invite_settings_form_validate($form, &$form_state) {
  */
 function user_external_invite_form($form, &$form_state) {
 
-  drupal_set_title(t('Invite New User'));
+  backdrop_set_title(t('Invite New User'));
 
   $core_rids = variable_get('user_external_invite_core_roles', []);
   if (empty($core_rids)) {
-    drupal_set_message(t('Your site is not yet configured to invite users. Contact the site administrator to configure the invite feature.'), 'status');
+    backdrop_set_message(t('Your site is not yet configured to invite users. Contact the site administrator to configure the invite feature.'), 'status');
   }
   else {
 
@@ -275,5 +275,5 @@ function user_external_invite_form_submit(&$form, &$form_state) {
 
   $addon_rids = $form_state['values']['addon_rids'] ? array_filter($form_state['values']['addon_rids'], function ($val) {return !empty($val);}) : [];
   _user_external_invite_add_invite($form_state['values']['core_rid'], $addon_rids, $form_state['values']['parsed_mails'], $user->uid, $form_state['values']['custom_message']);
-  drupal_set_message(t('Successfully invited new user!'));
+  backdrop_set_message(t('Successfully invited new user!'));
 }

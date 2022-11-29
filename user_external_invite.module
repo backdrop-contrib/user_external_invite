@@ -48,7 +48,7 @@ function user_external_invite_menu() {
   $items['admin/config/people/invite'] = array(
     'title' => 'User external invite settings',
     'description' => 'Configure roles, email addresses, message templates, etc',
-    'page callback' => 'drupal_get_form',
+    'page callback' => 'backdrop_get_form',
     'page arguments' => array('user_external_invite_settings_form'),
     'access arguments' => array('administer users'),
     'file' => 'user_external_invite.admin.inc',
@@ -91,7 +91,7 @@ function user_external_invite_menu() {
  * Page callback for admin/people/invite.
  */
 function user_external_invite_page() {
-  $build['form'] = drupal_get_form('user_external_invite_form');
+  $build['form'] = backdrop_get_form('user_external_invite_form');
   return $build;
 }
 
@@ -99,7 +99,7 @@ function user_external_invite_page() {
  * Page callback for admin/people/invite/operations.
  */
 function user_external_invite_operations_page() {
-  $build['invites'] = drupal_get_form('user_external_invite_pending_invites_form');
+  $build['invites'] = backdrop_get_form('user_external_invite_pending_invites_form');
   return $build;
 }
 
@@ -194,7 +194,7 @@ function user_external_invite_pending_invites_form($form, &$form_state) {
     );
   }
   else {
-    drupal_set_message(t('No invites available.'), 'status');
+    backdrop_set_message(t('No invites available.'), 'status');
   }
 
   return $form;
@@ -223,7 +223,7 @@ function user_external_invite_pending_invites_form_submit(&$form, &$form_state) 
 
   // If no IDs passed then return with error message.
   if (empty($ids)) {
-    drupal_set_message(t('No invites selected for operation. Please select desired invites and try again.'), 'error');
+    backdrop_set_message(t('No invites selected for operation. Please select desired invites and try again.'), 'error');
     return;
   }
 
@@ -240,7 +240,7 @@ function user_external_invite_pending_invites_form_submit(&$form, &$form_state) 
       // @todo Handle this better for possible errors. We're assuming invites were sent.
       $num_invites = count($ids);
       $plural_invites = $num_invites > 1 ? 'invites' : 'invite';
-      drupal_set_message(t('Successfully resent :number user :invites.', array(':number' => $num_invites, ':invites' => $plural_invites)));
+      backdrop_set_message(t('Successfully resent :number user :invites.', array(':number' => $num_invites, ':invites' => $plural_invites)));
       break;
     default:
       break;
@@ -276,7 +276,7 @@ function user_external_invite_cancel_invites($ids = array()) {
   db_delete('user_external_invite')
     ->condition('id', $ids, 'IN')
     ->execute();
-  drupal_set_message(t('Deleted :ids user :invites.', array(':ids' => count($ids), ':invites' => count($ids) > 1 ? 'invites' : 'invite')));
+  backdrop_set_message(t('Deleted :ids user :invites.', array(':ids' => count($ids), ':invites' => count($ids) > 1 ? 'invites' : 'invite')));
 }
 
 /**
@@ -367,7 +367,7 @@ function _user_external_invite_add_invite($core_rid, $addon_rids, $emails, $uid,
   );
 
   // @TODO: use universal email?
-  drupal_mail('user_external_invite', 'user_external_invite_sent', $user->mail, language_default(), $params, $from, TRUE);
+  backdrop_mail('user_external_invite', 'user_external_invite_sent', $user->mail, language_default(), $params, $from, TRUE);
 }
 
 /**
@@ -382,7 +382,7 @@ function _user_external_invite_send_invite($core_rid, $addon_rids, $email, $expi
  * Calculates the token based on $rid, $email, and $expire.
  */
 function _user_external_invite_calculate_hash($rid, $email, $expire) {
-  $hash = drupal_hmac_base64('user_rid:' . (int) $rid . ',user_mail:' . $email, drupal_get_hash_salt() . $email . (int) $expire);
+  $hash = backdrop_hmac_base64('user_rid:' . (int) $rid . ',user_mail:' . $email, backdrop_get_hash_salt() . $email . (int) $expire);
   return $hash;
 }
 
@@ -464,7 +464,7 @@ function _user_external_invite_send_invite_mail($core_rid, $addon_rids, $mail, $
   }
 
   // Send mail to user who was invited.
-  drupal_mail('user_external_invite', 'user_external_invite_token', $mail, language_default(), $params, $from, TRUE);
+  backdrop_mail('user_external_invite', 'user_external_invite_token', $mail, language_default(), $params, $from, TRUE);
 }
 
 /**
@@ -491,7 +491,7 @@ function _user_external_invite_send_invite_accepted_mail($core_rid, $addon_rids,
     $params['addon_role_names'] = implode(',', $addon_names);
   }
 
-  drupal_mail('user_external_invite', 'user_external_invite_accepted', $user_mail, language_default(), $params, $from, TRUE);
+  backdrop_mail('user_external_invite', 'user_external_invite_accepted', $user_mail, language_default(), $params, $from, TRUE);
 }
 
 /**
@@ -526,7 +526,7 @@ function _user_external_invite_send_inviter_confirmation($core_rid, $addon_rids,
     $params['addon_role_names'] = implode(',', $addon_names);
   }
 
-  drupal_mail('user_external_invite', 'user_external_invite_confirmation', $inviter->mail, language_default(),
+  backdrop_mail('user_external_invite', 'user_external_invite_confirmation', $inviter->mail, language_default(),
     $params, $from, TRUE);
 }
 
@@ -579,17 +579,17 @@ function user_external_invite_accept_invite() {
 
       // We're checking the email here since the user might not be created when invited.
       if (strtolower($user->mail) !== strtolower($_GET['mail'])) {
-        drupal_set_message(t('The email ":email" does not match the current user ":username". The invite role was not granted. ', array(':email' => $_GET['mail'], ':username' => $user->name)), 'error');
+        backdrop_set_message(t('The email ":email" does not match the current user ":username". The invite role was not granted. ', array(':email' => $_GET['mail'], ':username' => $user->name)), 'error');
       } else {
         // Grant the invite if it is for the logged in user.
         user_external_invite_grant_invite($_GET['key'], $_GET['mail'], $user);
       }
 
       // Always redirect to the user page regardless.
-      drupal_goto('user');
+      backdrop_goto('user');
     }
     else {
-      drupal_goto('user/login', array(
+      backdrop_goto('user/login', array(
         'query' => array(
           'key' => $_GET['key'],
           'mail' => $_GET['mail'],
@@ -618,7 +618,7 @@ function user_external_invite_grant_invite($key, $mail, $account) {
 
   if ($grant_rid && !$error_messages) {
     // Set message to user that role was granted.
-    drupal_set_message(t('Invite accepted!'));
+    backdrop_set_message(t('Invite accepted!'));
 
     // Check to see if the user already has the role.  Because the email
     // Used in the invite is not always = to LDAP, they could already be
@@ -652,12 +652,12 @@ function user_external_invite_grant_invite($key, $mail, $account) {
   // If messages from pre_grant_invite exists, combine them and print to screen.
   elseif ($error_messages) {
     foreach ($error_messages as $message) {
-      drupal_set_message(t($message), 'error');
+      backdrop_set_message(t($message), 'error');
     }
   }
   // Provide generic error message if no other messages exist.
   else {
-    drupal_set_message( t('Invite invalid or has expired! If you feel you have received this in error, please contact a site owner.'), 'error');
+    backdrop_set_message( t('Invite invalid or has expired! If you feel you have received this in error, please contact a site owner.'), 'error');
   }
 }
 
@@ -686,7 +686,7 @@ function _user_external_invite_load_entity($mail) {
 function user_external_invite_user_login(&$edit, $account) {
   if (isset($_GET['key']) && isset($_GET['mail'])) {
     user_external_invite_grant_invite($_GET['key'], $_GET['mail'], $account);
-    drupal_goto('user');
+    backdrop_goto('user');
   }
 }
 
@@ -948,7 +948,7 @@ function user_external_invite_form_alter(&$form, &$form_state) {
     if ($role_ids = db_query('SELECT core_rid FROM {user_external_invite} WHERE status = :status', array(':status' => 'Pending'))->fetchCol()) {
       // Print out role names to attach to warning message.
       $role_names = array_map(function($a) {return _user_external_invite_role_name_from_rid($a);}, $role_ids);
-      drupal_set_message(
+      backdrop_set_message(
         t('User Invites are still pending with roles of: :roles. Altering roles or permissions could interfere with the user invite process. Pending invites can be viewed at: <a href="' . base_path() . 'admin/people/invite">admin/people/invite</a>', array(':roles' => implode(', ', $role_names))), 'warning');
     }
   }
