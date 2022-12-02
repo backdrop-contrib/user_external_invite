@@ -28,7 +28,6 @@ function user_external_invite_schema() {
       'core_rid' => array(
         'description' => 'Core role ID to be granted',
         'type' => 'int',
-        'not null' => TRUE,
         'default' => 2,
       ),
       'role' => array(
