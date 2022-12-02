@@ -16,7 +16,7 @@ function user_external_invite_entity_info() {
     'label' => t('Invite'),
     'base table' => 'user_external_invite',
     'entity class' => 'Entity',
-    'controller class' => 'EntityAPIController',
+    'controller class' => 'NodeStorageController',
     'entity keys' => array(
       'id' => 'id',
       'label' => 'mail',
@@ -260,7 +260,7 @@ function user_external_invite_resend_invites($ids = array(), $message = '') {
   $resend = TRUE;
   foreach ($results as $result) {
     $message = !empty($message) ? $message : $result->message;
-    _user_external_invite_add_invite($result->core_rid, unserialize($result->addon_rids), array($result->mail), $result->uid, $message, $resend);
+    _user_external_invite_add_invite($result->role, array($result->mail), $result->uid, $message, $resend);
   }
 }
 
@@ -308,6 +308,7 @@ function _user_external_invite_pending_invites(string $mail = NULL, $headers) {
  * Adds invite to database and sends email.
  */
 function _user_external_invite_add_invite($role, $emails, $uid, $message = NULL, $resend = FALSE) {
+ 
   // Expire the invite in X days.
   $expire = REQUEST_TIME + (variable_get('user_external_invite_days_valid_for', 5) * 24 * 60 * 60);
   // All invites start out as pending.
@@ -592,6 +593,7 @@ function user_external_invite_grant_invite($key, $mail, $account) {
     backdrop_set_message(t('Invite accepted!'));
 
     // @TODO: NEEDS WORK
+
     // Check to see if the user already has the role.  Because the email
     // Used in the invite is not always = to LDAP, they could already be
     // In the role.
@@ -645,7 +647,7 @@ function _user_external_invite_load_entity($mail) {
 
   if ($result['ext-invite']) {
     $id = array_pop($result['ext-invite']);
-    return entity_load_single('ext-invite', $id->id);
+    return entity_load('ext-invite', $id->id);
   }
 }
 
@@ -852,7 +854,8 @@ function user_external_invite_tokens($type, $tokens, array $data = array(), arra
  */
 function _user_external_invite_load_related_invites($entity) {
   $query = new EntityFieldQuery();
-
+  
+  // @TODO: This fails if db insert fails
   $query->entityCondition('entity_type', 'ext-invite')
     ->propertyCondition('expire', $entity->expire);
 

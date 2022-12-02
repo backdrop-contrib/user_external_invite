@@ -175,7 +175,7 @@ function user_external_invite_form($form, &$form_state) {
   }
   else {
     
-    // @TODO: Look at rid -> role name in Backdrop
+    // @TODO: Look at rid -> role name in
     $core_role_options = [];
     foreach ($core_rids as $val) {
       if ($val) {
@@ -251,6 +251,6 @@ function user_external_invite_form_submit(&$form, &$form_state) {
   global $user;
 
   $addon_rids = $form_state['values']['addon_rids'] ? array_filter($form_state['values']['addon_rids'], function ($val) {return !empty($val);}) : [];
-  _user_external_invite_add_invite($form_state['values']['core_rid'], $addon_rids, $form_state['values']['parsed_mails'], $user->uid, $form_state['values']['custom_message']);
+  _user_external_invite_add_invite($form_state['values']['role'], $form_state['values']['parsed_mails'], $user->uid, $form_state['values']['custom_message']);
   backdrop_set_message(t('Successfully invited new user!'));
 }
