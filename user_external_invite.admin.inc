@@ -27,16 +27,8 @@ function user_external_invite_settings_form() {
     '#title' => t('Core Roles users can be invited to join'),
     '#description' => t('Users with permission to send invites will be able to invite users to join a site with any of these roles. GRANT WITH CAUTION!'),
     '#options' => $user_roles,
-    '#default_value' => variable_get('user_external_invite_core_roles', NULL),
-  );
+    '#default_value' => variable_get('user_external_invite_core_roles', NULL),  );
 
-  $form['user_external_invite_addon_roles'] = array(
-    '#type' => 'checkboxes',
-    '#title' => t('Add-on Roles users can be invited to join'),
-    '#description' => t('Users with permission to send invites will be able to invite users to join a site with any of these roles. GRANT WITH CAUTION!'),
-    '#options' => $user_roles,
-    '#default_value' => variable_get('user_external_invite_addon_roles', NULL),
-  );
 
   $form['user_external_invite_default_role'] = array(
     '#title' => t('Default Role to Invite'),
@@ -137,13 +129,14 @@ function user_external_invite_settings_form() {
   );
 
   // @TODO: add warning email about expiring invitations.
-  if (module_exists('token')) {
+  // @TODO: update to use Backdrop token implementation
+  //if (module_exists('token')) {
     $form['token_help']['content'] = array(
       '#type' => 'markup',
       // '#token_types' => 'user_external_invite',
       '#theme' => 'token_tree',
     );
-  }
+  //}
 
   return system_settings_form($form);
 }
@@ -181,7 +174,8 @@ function user_external_invite_form($form, &$form_state) {
     backdrop_set_message(t('Your site is not yet configured to invite users. Contact the site administrator to configure the invite feature.'), 'status');
   }
   else {
-
+    
+    // @TODO: Look at rid -> role name in Backdrop
     $core_role_options = [];
     foreach ($core_rids as $val) {
       if ($val) {
@@ -189,30 +183,13 @@ function user_external_invite_form($form, &$form_state) {
       }
     }
 
-    $addon_rids = variable_get('user_external_invite_addon_roles', []);
-    $addon_role_options = [];
-    foreach ($addon_rids as $val) {
-      if ($val) {
-        $addon_role_options[$val] = _user_external_invite_role_name_from_rid($val);
-      }
-    }
-
-    $form['core_rid'] = array(
+    $form['role'] = array(
       '#title' => t('Core Role'),
       '#type' => 'radios',
       '#options' => $core_role_options,
       '#default_value' => variable_get('user_external_invite_default_role', key($core_role_options)),
       '#required' => TRUE,
     );
-
-    // Hide Add-on roles if none selected.
-    if ($addon_role_options) {
-      $form['addon_rids'] = array(
-        '#type' => 'checkboxes',
-        '#title' => t('Add-on Roles'),
-        '#options' => $addon_role_options,
-      );
-    }
 
     $form['email'] = array(
       '#title' => t('Email addresses'),

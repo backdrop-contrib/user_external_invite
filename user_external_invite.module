@@ -111,7 +111,6 @@ function user_external_invite_pending_invites_form($form, &$form_state) {
     'id' => t('ID'),
     'mail' => t('Email'),
     'core_role' => t('Core Role'),
-    'addon_roles' => t('Add-on Roles'),
     'expire' => t('Expires'),
     'inviter' => t('Inviter'),
     'status' => t('Status'),
